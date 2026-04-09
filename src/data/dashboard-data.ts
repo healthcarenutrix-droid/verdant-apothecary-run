@@ -270,6 +270,33 @@ export const addReview = (r: Review) => { const all = getReviews(); all.push(r);
 export const updateReview = (r: Review) => { const all = getReviews().map(x => x.id === r.id ? r : x); saveReviews(all); };
 export const deleteReview = (id: string) => { saveReviews(getReviews().filter(x => x.id !== id)); };
 
+// Contact Messages
+export interface ContactMessage {
+  id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  date: string;
+  status: "unread" | "read" | "replied" | "archived";
+  reply?: string;
+  repliedAt?: string;
+}
+
+const defaultMessages: ContactMessage[] = [
+  { id: "msg-1", name: "Ali Hassan", email: "ali@example.com", subject: "Product Inquiry", message: "I want to know about the availability of Kashmiri Saffron in bulk. Do you offer wholesale pricing?", date: "2024-03-10T10:30:00", status: "read" },
+  { id: "msg-2", name: "Fatima Khan", email: "fatima@example.com", subject: "Order Issue", message: "My order #ORD-003 has not arrived yet. It's been 10 days since I placed it. Please help.", date: "2024-03-12T14:20:00", status: "replied", reply: "We're sorry for the delay. Your order has been reshipped and you should receive it within 3 days.", repliedAt: "2024-03-12T16:00:00" },
+  { id: "msg-3", name: "Ahmed Raza", email: "ahmed.raza@example.com", subject: "Return Request", message: "I received the wrong product. I ordered Black Pepper but received Red Chilli Powder. Please arrange a return.", date: "2024-03-14T09:15:00", status: "unread" },
+  { id: "msg-4", name: "Sara Malik", email: "sara@example.com", subject: "Partnership Opportunity", message: "We run a chain of organic stores and would love to partner with MSUR Herbs. Can we schedule a call?", date: "2024-03-15T11:45:00", status: "unread" },
+  { id: "msg-5", name: "Usman Tariq", email: "usman@example.com", subject: "Feedback", message: "I've been using your Ashwagandha powder for 2 months now and the quality is amazing. Keep up the great work!", date: "2024-03-16T08:00:00", status: "read" },
+];
+
+export const getMessages = (): ContactMessage[] => getStore("admin_messages", defaultMessages);
+export const saveMessages = (m: ContactMessage[]) => setStore("admin_messages", m);
+export const addMessage = (m: ContactMessage) => { const all = getMessages(); all.unshift(m); saveMessages(all); };
+export const updateMessage = (m: ContactMessage) => { const all = getMessages().map(x => x.id === m.id ? m : x); saveMessages(all); };
+export const deleteMessage = (id: string) => { saveMessages(getMessages().filter(x => x.id !== id)); };
+
 // Reset to defaults
 export const resetProducts = () => { localStorage.removeItem("admin_products"); };
 export const resetCategories = () => { localStorage.removeItem("admin_categories"); };
