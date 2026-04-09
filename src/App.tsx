@@ -26,6 +26,7 @@ import DashboardProducts from "./pages/dashboard/DashboardProducts";
 import DashboardCategories from "./pages/dashboard/DashboardCategories";
 import DashboardOrders from "./pages/dashboard/DashboardOrders";
 import DashboardReviews from "./pages/dashboard/DashboardReviews";
+import DashboardMessages from "./pages/dashboard/DashboardMessages";
 
 const queryClient = new QueryClient();
 
@@ -69,6 +70,7 @@ const App = () => (
                   <Route path="categories" element={<DashboardCategories />} />
                   <Route path="orders" element={<DashboardOrders />} />
                   <Route path="reviews" element={<DashboardReviews />} />
+                  <Route path="messages" element={<DashboardMessages />} />
                 </Route>
                 <Route path="/*" element={<StorefrontLayout />} />
               </Routes>

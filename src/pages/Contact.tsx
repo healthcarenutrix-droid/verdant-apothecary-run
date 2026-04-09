@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { addMessage, type ContactMessage } from "@/data/dashboard-data";
 
 const Contact = () => {
   const { toast } = useToast();
@@ -20,6 +21,16 @@ const Contact = () => {
       toast({ title: "Invalid email", description: "Please enter a valid email address.", variant: "destructive" });
       return;
     }
+    const newMsg: ContactMessage = {
+      id: `msg-${Date.now()}`,
+      name: form.name,
+      email: form.email,
+      subject: form.subject || "No Subject",
+      message: form.message,
+      date: new Date().toISOString(),
+      status: "unread",
+    };
+    addMessage(newMsg);
     toast({ title: "Message sent!", description: "We'll get back to you soon." });
     setForm({ name: "", email: "", subject: "", message: "" });
   };
