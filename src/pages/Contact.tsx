@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { addMessage, type ContactMessage } from "@/data/dashboard-data";
 
 const Contact = () => {
   const { toast } = useToast();
