@@ -18,12 +18,20 @@ import catOils from "@/assets/cat-oils.webp";
 import catHerbs from "@/assets/cat-herbs.webp";
 import catSpices from "@/assets/cat-spices.webp";
 
+export interface ProductOption {
+  id: string;
+  name: string; // e.g. "Size", "Color", "Weight"
+  values: string[]; // e.g. ["Small", "Medium", "Large"]
+}
+
 export interface ProductVariant {
   id: string;
-  label: string; // e.g. "50g", "100g", "250g"
+  label: string; // e.g. "Small / Blue" or "100g"
+  optionValues: Record<string, string>; // e.g. { Size: "Small", Color: "Blue" }
   price: number;
   compareAtPrice?: number;
   stock: number;
+  sku?: string;
 }
 
 export interface AdminProduct {
@@ -40,6 +48,7 @@ export interface AdminProduct {
   createdAt: string;
   priceRange?: string;
   rating?: number;
+  options?: ProductOption[];
   variants?: ProductVariant[];
 }
 
