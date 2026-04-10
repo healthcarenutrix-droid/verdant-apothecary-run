@@ -5,76 +5,79 @@ import { Button } from "@/components/ui/button";
 import { blogPostsData, BlogPost } from "@/pages/BlogPost";
 
 const CATEGORIES = ["All", ...Array.from(new Set(blogPostsData.map(p => p.category)))];
+const POSTS_PER_PAGE = 6;
 
 const Blog = () => {
   const [activeCategory, setActiveCategory] = useState("All");
   const [heroIndex, setHeroIndex] = useState(0);
+  const [showAll, setShowAll] = useState(false);
 
-  const featured = blogPostsData.filter(p => p.featured);
-  const currentFeatured = featured[heroIndex] || featured[0];
+  // Hero slider loops through ALL blog posts
+  const allPosts = blogPostsData;
+  const currentHero = allPosts[heroIndex];
+
+  const nextHero = () => setHeroIndex((heroIndex + 1) % allPosts.length);
+  const prevHero = () => setHeroIndex((heroIndex - 1 + allPosts.length) % allPosts.length);
 
   const filteredPosts = activeCategory === "All"
-    ? blogPostsData.filter(p => !p.featured)
-    : blogPostsData.filter(p => p.category === activeCategory && !p.featured);
+    ? blogPostsData
+    : blogPostsData.filter(p => p.category === activeCategory);
 
-  const nextHero = () => setHeroIndex((heroIndex + 1) % featured.length);
-  const prevHero = () => setHeroIndex((heroIndex - 1 + featured.length) % featured.length);
+  const visiblePosts = showAll ? filteredPosts : filteredPosts.slice(0, POSTS_PER_PAGE);
 
   return (
     <div>
       {/* Hero Featured Slider */}
-      {currentFeatured && (
+      {currentHero && (
         <section className="relative bg-muted/30">
           <div className="max-w-7xl mx-auto px-4 lg:px-8 py-10 md:py-16">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
               {/* Text Side */}
               <div className="space-y-5 order-2 md:order-1">
                 <span className="inline-block bg-primary/10 text-primary text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
-                  {currentFeatured.category}
+                  {currentHero.category}
                 </span>
                 <h1 className="text-2xl md:text-4xl font-bold text-foreground leading-tight">
-                  {currentFeatured.title}
+                  {currentHero.title}
                 </h1>
                 <div className="w-16 h-1 bg-primary rounded-full" />
                 <p className="text-muted-foreground leading-relaxed text-base">
-                  {currentFeatured.excerpt}
+                  {currentHero.excerpt}
                 </p>
                 <Button asChild className="group">
-                  <Link to={`/blog/${currentFeatured.slug}`}>
+                  <Link to={`/blog/${currentHero.slug}`}>
                     Read This Article <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </Link>
                 </Button>
 
                 {/* Slider controls */}
-                {featured.length > 1 && (
-                  <div className="flex items-center gap-3 pt-4">
-                    <Button variant="outline" size="icon" className="h-8 w-8 rounded-full" onClick={prevHero}>
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <div className="flex items-center gap-2">
-                      {featured.map((_, i) => (
-                        <button
-                          key={i}
-                          onClick={() => setHeroIndex(i)}
-                          className={`transition-all duration-300 rounded-full ${
-                            i === heroIndex ? "w-8 h-2.5 bg-primary" : "w-2.5 h-2.5 bg-muted-foreground/30 hover:bg-muted-foreground/50"
-                          }`}
-                        />
-                      ))}
-                    </div>
-                    <Button variant="outline" size="icon" className="h-8 w-8 rounded-full" onClick={nextHero}>
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
+                <div className="flex items-center gap-3 pt-4">
+                  <Button variant="outline" size="icon" className="h-8 w-8 rounded-full" onClick={prevHero}>
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <div className="flex items-center gap-2">
+                    {allPosts.map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setHeroIndex(i)}
+                        className={`transition-all duration-300 rounded-full ${
+                          i === heroIndex ? "w-8 h-2.5 bg-primary" : "w-2.5 h-2.5 bg-muted-foreground/30 hover:bg-muted-foreground/50"
+                        }`}
+                      />
+                    ))}
                   </div>
-                )}
+                  <Button variant="outline" size="icon" className="h-8 w-8 rounded-full" onClick={nextHero}>
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
 
               {/* Image Side */}
               <div className="order-1 md:order-2">
-                <Link to={`/blog/${currentFeatured.slug}`} className="block rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
+                <Link to={`/blog/${currentHero.slug}`} className="block rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
                   <img
-                    src={currentFeatured.image}
-                    alt={currentFeatured.title}
+                    src={currentHero.image}
+                    alt={currentHero.title}
                     className="w-full h-64 md:h-[380px] object-cover hover:scale-105 transition-transform duration-700"
                     width={800}
                     height={512}
@@ -88,7 +91,6 @@ const Blog = () => {
 
       {/* Articles Section */}
       <section className="max-w-7xl mx-auto px-4 lg:px-8 py-12">
-        {/* Section Header + Category Tabs */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <h2 className="text-2xl font-bold text-foreground">
             Featured Articles, Picked Just For You
@@ -99,7 +101,7 @@ const Blog = () => {
           {CATEGORIES.map(cat => (
             <button
               key={cat}
-              onClick={() => setActiveCategory(cat)}
+              onClick={() => { setActiveCategory(cat); setShowAll(false); }}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                 activeCategory === cat
                   ? "bg-primary text-primary-foreground shadow-sm"
@@ -111,19 +113,33 @@ const Blog = () => {
           ))}
         </div>
 
-        {/* Blog Grid — first post large, rest in 2-column */}
-        {filteredPosts.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Large first card */}
-            <div className="md:row-span-2">
-              <BlogCard post={filteredPosts[0]} large />
+        {/* Blog Grid */}
+        {visiblePosts.length > 0 ? (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Large first card */}
+              <div className="md:row-span-2">
+                <BlogCard post={visiblePosts[0]} large />
+              </div>
+              {visiblePosts.slice(1).map(post => (
+                <BlogCard key={post.slug} post={post} />
+              ))}
             </div>
 
-            {/* Remaining cards */}
-            {filteredPosts.slice(1).map(post => (
-              <BlogCard key={post.slug} post={post} />
-            ))}
-          </div>
+            {/* View All Button */}
+            {!showAll && filteredPosts.length > POSTS_PER_PAGE && (
+              <div className="text-center mt-10">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={() => setShowAll(true)}
+                  className="px-8"
+                >
+                  View All Articles ({filteredPosts.length})
+                </Button>
+              </div>
+            )}
+          </>
         ) : (
           <div className="text-center py-16 text-muted-foreground">
             <p>No articles found in this category.</p>
