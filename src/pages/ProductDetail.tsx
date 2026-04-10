@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Star, Minus, Plus, ShoppingCart, ChevronRight, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -17,8 +17,23 @@ const ProductDetail = () => {
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const [qty, setQty] = useState(1);
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
+
   const wishlisted = product ? isInWishlist(product.id) : false;
-  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
+  const hasOptions = product?.options && product.options.length > 0;
+  const hasVariants = product?.variants && product.variants.length > 0;
+
+  const selectedVariant: ProductVariant | null = useMemo(() => {
+    if (!product || !hasVariants || !hasOptions) return null;
+    if (Object.keys(selectedOptions).length !== (product.options?.length || 0)) return null;
+    return product.variants?.find(v =>
+      product.options!.every(opt => v.optionValues[opt.name] === selectedOptions[opt.name])
+    ) || null;
+  }, [selectedOptions, product, hasVariants, hasOptions]);
+
+  const activePrice = selectedVariant ? selectedVariant.price : (product?.price || 0);
+  const activeCompare = selectedVariant?.compareAtPrice || product?.originalPrice;
+  const allImages = product?.images && product.images.length > 0 ? product.images : (product?.image ? [product.image] : []);
 
   if (!product) {
     return (
@@ -30,10 +45,23 @@ const ProductDetail = () => {
   }
 
   const related = products.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 4);
-  const hasVariants = product.variants && product.variants.length > 0;
-  const activePrice = selectedVariant ? selectedVariant.price : product.price;
-  const activeCompare = selectedVariant?.compareAtPrice || product.originalPrice;
-  const allImages = product.images && product.images.length > 0 ? product.images : (product.image ? [product.image] : []);
+
+
+  const handleSelectOption = (optionName: string, value: string) => {
+    setSelectedOptions(prev => ({ ...prev, [optionName]: value }));
+  };
+
+  // Check if a specific option value is available (has stock in any matching variant)
+  const isValueAvailable = (optionName: string, value: string): boolean => {
+    if (!product.variants) return true;
+    return product.variants.some(v =>
+      v.optionValues[optionName] === value && v.stock > 0
+    );
+  };
+
+  const allOptionsSelected = hasOptions
+    ? Object.keys(selectedOptions).length === (product.options?.length || 0)
+    : true;
 
   const handleAdd = () => {
     for (let i = 0; i < qty; i++) addToCart(product, selectedVariant || undefined);
@@ -78,32 +106,50 @@ const ProductDetail = () => {
                 <span className="text-lg text-muted-foreground line-through">₨ {activeCompare.toLocaleString()}</span>
               )}
               <span className="text-2xl font-bold text-foreground">₨ {activePrice.toLocaleString()}</span>
+              {selectedVariant && selectedVariant.stock <= 5 && selectedVariant.stock > 0 && (
+                <span className="text-xs text-destructive font-medium">Only {selectedVariant.stock} left!</span>
+              )}
             </div>
 
             <p className="text-muted-foreground">{product.description}</p>
 
-            {/* Variants */}
-            {hasVariants && (
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Size / Quantity</label>
+            {/* Multi-Option Selectors */}
+            {hasOptions && product.options!.map(option => (
+              <div key={option.id} className="space-y-2">
+                <label className="text-sm font-medium text-foreground">
+                  {option.name}
+                  {selectedOptions[option.name] && (
+                    <span className="text-muted-foreground font-normal ml-2">— {selectedOptions[option.name]}</span>
+                  )}
+                </label>
                 <div className="flex flex-wrap gap-2">
-                  {product.variants!.map((v) => (
-                    <button
-                      key={v.id}
-                      onClick={() => setSelectedVariant(v)}
-                      className={`px-4 py-2 rounded-md border text-sm font-medium transition-all ${
-                        selectedVariant?.id === v.id
-                          ? "border-primary bg-primary text-primary-foreground"
-                          : "border-border hover:border-primary text-foreground"
-                      } ${v.stock === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
-                      disabled={v.stock === 0}
-                    >
-                      {v.label}
-                      {v.stock === 0 && " (Out of stock)"}
-                    </button>
-                  ))}
+                  {option.values.map(val => {
+                    const available = isValueAvailable(option.name, val);
+                    const isSelected = selectedOptions[option.name] === val;
+                    return (
+                      <button
+                        key={val}
+                        onClick={() => handleSelectOption(option.name, val)}
+                        disabled={!available}
+                        className={`px-4 py-2 rounded-md border text-sm font-medium transition-all ${
+                          isSelected
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : available
+                              ? "border-border hover:border-primary text-foreground"
+                              : "border-border bg-muted text-muted-foreground opacity-50 cursor-not-allowed line-through"
+                        }`}
+                      >
+                        {val}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
+            ))}
+
+            {/* SKU display */}
+            {selectedVariant?.sku && (
+              <p className="text-xs text-muted-foreground">SKU: {selectedVariant.sku}</p>
             )}
 
             <div className="flex items-center gap-4 pt-2">
@@ -119,7 +165,7 @@ const ProductDetail = () => {
               <Button
                 onClick={handleAdd}
                 className="flex-1 md:flex-none md:px-12"
-                disabled={hasVariants && !selectedVariant}
+                disabled={hasOptions && !allOptionsSelected}
               >
                 <ShoppingCart className="h-4 w-4 mr-2" /> Add to Cart
               </Button>
@@ -132,8 +178,11 @@ const ProductDetail = () => {
               </Button>
             </div>
 
-            {hasVariants && !selectedVariant && (
-              <p className="text-sm text-muted-foreground italic">Please select a variant to add to cart</p>
+            {hasOptions && !allOptionsSelected && (
+              <p className="text-sm text-muted-foreground italic">Please select all options to add to cart</p>
+            )}
+            {selectedVariant && selectedVariant.stock === 0 && (
+              <p className="text-sm text-destructive italic">This variant is out of stock</p>
             )}
 
             <div className="border-t border-border pt-5 space-y-2 text-sm">

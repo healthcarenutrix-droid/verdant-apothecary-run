@@ -18,12 +18,20 @@ import catOils from "@/assets/cat-oils.webp";
 import catHerbs from "@/assets/cat-herbs.webp";
 import catSpices from "@/assets/cat-spices.webp";
 
+export interface ProductOption {
+  id: string;
+  name: string; // e.g. "Size", "Color", "Weight"
+  values: string[]; // e.g. ["Small", "Medium", "Large"]
+}
+
 export interface ProductVariant {
   id: string;
-  label: string; // e.g. "50g", "100g", "250g"
+  label: string; // e.g. "Small / Blue" or "100g"
+  optionValues: Record<string, string>; // e.g. { Size: "Small", Color: "Blue" }
   price: number;
   compareAtPrice?: number;
   stock: number;
+  sku?: string;
 }
 
 export interface AdminProduct {
@@ -40,6 +48,7 @@ export interface AdminProduct {
   createdAt: string;
   priceRange?: string;
   rating?: number;
+  options?: ProductOption[];
   variants?: ProductVariant[];
 }
 
@@ -94,47 +103,52 @@ const defaultProducts: AdminProduct[] = [
     id: "prod-1", name: "Saffron | Zafran | زعفران", price: 1450, stock: 25, categoryId: "cat-1",
     image: prodSaffron, images: [prodSaffron],
     status: "active", description: "Premium quality saffron threads", createdAt: "2025-02-01", rating: 5,
+    options: [{ id: "opt-1-1", name: "Weight", values: ["1g", "2g", "5g"] }],
     variants: [
-      { id: "v1-1", label: "1g", price: 1450, stock: 25 },
-      { id: "v1-2", label: "2g", price: 2800, stock: 15 },
-      { id: "v1-3", label: "5g", price: 6500, compareAtPrice: 7250, stock: 8 },
+      { id: "v1-1", label: "1g", optionValues: { Weight: "1g" }, price: 1450, stock: 25 },
+      { id: "v1-2", label: "2g", optionValues: { Weight: "2g" }, price: 2800, stock: 15 },
+      { id: "v1-3", label: "5g", optionValues: { Weight: "5g" }, price: 6500, compareAtPrice: 7250, stock: 8 },
     ],
   },
   {
     id: "prod-2", name: "Pomegranate Seeds | Annar Dana | اناردانہ", price: 120, compareAtPrice: 220, stock: 60, categoryId: "cat-3",
     image: prodAnardana, images: [prodAnardana],
     status: "active", description: "Dried pomegranate seeds", createdAt: "2025-02-03", rating: 4, priceRange: "₨ 120–₨ 220",
+    options: [{ id: "opt-2-1", name: "Weight", values: ["100g", "250g"] }],
     variants: [
-      { id: "v2-1", label: "100g", price: 120, stock: 60 },
-      { id: "v2-2", label: "250g", price: 220, compareAtPrice: 280, stock: 30 },
+      { id: "v2-1", label: "100g", optionValues: { Weight: "100g" }, price: 120, stock: 60 },
+      { id: "v2-2", label: "250g", optionValues: { Weight: "250g" }, price: 220, compareAtPrice: 280, stock: 30 },
     ],
   },
   {
     id: "prod-3", name: "Kali Mirch Powder (Black Pepper Powder)", price: 550, compareAtPrice: 700, stock: 40, categoryId: "cat-2",
     image: prodKaliMirch, images: [prodKaliMirch],
     status: "active", description: "Premium ground black pepper", createdAt: "2025-02-05", rating: 5,
+    options: [{ id: "opt-3-1", name: "Weight", values: ["100g", "250g"] }],
     variants: [
-      { id: "v3-1", label: "100g", price: 550, compareAtPrice: 700, stock: 40 },
-      { id: "v3-2", label: "250g", price: 1200, compareAtPrice: 1500, stock: 20 },
+      { id: "v3-1", label: "100g", optionValues: { Weight: "100g" }, price: 550, compareAtPrice: 700, stock: 40 },
+      { id: "v3-2", label: "250g", optionValues: { Weight: "250g" }, price: 1200, compareAtPrice: 1500, stock: 20 },
     ],
   },
   {
     id: "prod-4", name: "Kali Mirch Sabat (Black Pepper Whole)", price: 180, stock: 45, categoryId: "cat-2",
     image: prodBlackPepper, images: [prodBlackPepper],
     status: "active", description: "Whole black peppercorns", createdAt: "2025-02-08", rating: 4, priceRange: "₨ 180–₨ 550",
+    options: [{ id: "opt-4-1", name: "Weight", values: ["50g", "100g", "250g"] }],
     variants: [
-      { id: "v4-1", label: "50g", price: 180, stock: 45 },
-      { id: "v4-2", label: "100g", price: 320, stock: 30 },
-      { id: "v4-3", label: "250g", price: 550, stock: 15 },
+      { id: "v4-1", label: "50g", optionValues: { Weight: "50g" }, price: 180, stock: 45 },
+      { id: "v4-2", label: "100g", optionValues: { Weight: "100g" }, price: 320, stock: 30 },
+      { id: "v4-3", label: "250g", optionValues: { Weight: "250g" }, price: 550, stock: 15 },
     ],
   },
   {
     id: "prod-5", name: "Ginger | Sund | سنڈھ", price: 210, stock: 35, categoryId: "cat-1",
     image: prodGinger, images: [prodGinger],
     status: "active", description: "Dried ginger powder", createdAt: "2025-02-10", rating: 5,
+    options: [{ id: "opt-5-1", name: "Weight", values: ["100g", "250g"] }],
     variants: [
-      { id: "v5-1", label: "100g", price: 210, stock: 35 },
-      { id: "v5-2", label: "250g", price: 480, stock: 20 },
+      { id: "v5-1", label: "100g", optionValues: { Weight: "100g" }, price: 210, stock: 35 },
+      { id: "v5-2", label: "250g", optionValues: { Weight: "250g" }, price: 480, stock: 20 },
     ],
   },
   {
@@ -146,60 +160,66 @@ const defaultProducts: AdminProduct[] = [
     id: "prod-7", name: "Lal Mirch Darla - Red Chilli Powder", price: 120, stock: 55, categoryId: "cat-2",
     image: prodRedChilli, images: [prodRedChilli],
     status: "active", description: "Premium red chilli powder", createdAt: "2025-02-15", rating: 5, priceRange: "₨ 120–₨ 450",
+    options: [{ id: "opt-7-1", name: "Weight", values: ["100g", "250g", "500g"] }],
     variants: [
-      { id: "v7-1", label: "100g", price: 120, stock: 55 },
-      { id: "v7-2", label: "250g", price: 280, stock: 30 },
-      { id: "v7-3", label: "500g", price: 450, stock: 15 },
+      { id: "v7-1", label: "100g", optionValues: { Weight: "100g" }, price: 120, stock: 55 },
+      { id: "v7-2", label: "250g", optionValues: { Weight: "250g" }, price: 280, stock: 30 },
+      { id: "v7-3", label: "500g", optionValues: { Weight: "500g" }, price: 450, stock: 15 },
     ],
   },
   {
     id: "prod-8", name: "Sabz Elaichi (Green Cardamom)", price: 180, stock: 3, categoryId: "cat-2",
     image: prodCardamom, images: [prodCardamom],
     status: "active", description: "Fragrant green cardamom pods", createdAt: "2025-02-18", rating: 5, priceRange: "₨ 180–₨ 800",
+    options: [{ id: "opt-8-1", name: "Weight", values: ["25g", "50g", "100g", "250g"] }],
     variants: [
-      { id: "v8-1", label: "25g", price: 180, stock: 3 },
-      { id: "v8-2", label: "50g", price: 350, stock: 5 },
-      { id: "v8-3", label: "100g", price: 650, stock: 2 },
-      { id: "v8-4", label: "250g", price: 800, stock: 1 },
+      { id: "v8-1", label: "25g", optionValues: { Weight: "25g" }, price: 180, stock: 3 },
+      { id: "v8-2", label: "50g", optionValues: { Weight: "50g" }, price: 350, stock: 5 },
+      { id: "v8-3", label: "100g", optionValues: { Weight: "100g" }, price: 650, stock: 2 },
+      { id: "v8-4", label: "250g", optionValues: { Weight: "250g" }, price: 800, stock: 1 },
     ],
   },
   {
     id: "prod-9", name: "Ashwagandha | Asgand Nagori", price: 150, stock: 2, categoryId: "cat-1",
     image: prodAshwagandha, images: [prodAshwagandha],
     status: "active", description: "Withania Somnifera root", createdAt: "2025-03-01", rating: 5, priceRange: "₨ 150–₨ 1,500",
+    options: [{ id: "opt-9-1", name: "Weight", values: ["50g", "100g", "500g"] }],
     variants: [
-      { id: "v9-1", label: "50g", price: 150, stock: 2 },
-      { id: "v9-2", label: "100g", price: 280, stock: 5 },
-      { id: "v9-3", label: "500g", price: 1500, stock: 1 },
+      { id: "v9-1", label: "50g", optionValues: { Weight: "50g" }, price: 150, stock: 2 },
+      { id: "v9-2", label: "100g", optionValues: { Weight: "100g" }, price: 280, stock: 5 },
+      { id: "v9-3", label: "500g", optionValues: { Weight: "500g" }, price: 1500, stock: 1 },
     ],
   },
   {
     id: "prod-10", name: "Shikakai | Soap Pod | سکاکائی", price: 60, stock: 70, categoryId: "cat-1",
     image: prodShikakai, images: [prodShikakai],
     status: "active", description: "Natural hair care herb", createdAt: "2025-03-05", rating: 4, priceRange: "₨ 60–₨ 650",
+    options: [{ id: "opt-10-1", name: "Weight", values: ["100g", "500g", "1kg"] }],
     variants: [
-      { id: "v10-1", label: "100g", price: 60, stock: 70 },
-      { id: "v10-2", label: "500g", price: 250, stock: 30 },
-      { id: "v10-3", label: "1kg", price: 650, stock: 10 },
+      { id: "v10-1", label: "100g", optionValues: { Weight: "100g" }, price: 60, stock: 70 },
+      { id: "v10-2", label: "500g", optionValues: { Weight: "500g" }, price: 250, stock: 30 },
+      { id: "v10-3", label: "1kg", optionValues: { Weight: "1kg" }, price: 650, stock: 10 },
     ],
   },
   {
     id: "prod-11", name: "White Pepper Whole | Safeed Mirch", price: 320, stock: 30, categoryId: "cat-2",
     image: prodWhitePepper, images: [prodWhitePepper],
     status: "active", description: "Premium whole white pepper", createdAt: "2025-03-08", rating: 4, priceRange: "₨ 320–₨ 620",
+    options: [{ id: "opt-11-1", name: "Weight", values: ["50g", "100g"] }],
     variants: [
-      { id: "v11-1", label: "50g", price: 320, stock: 30 },
-      { id: "v11-2", label: "100g", price: 620, stock: 15 },
+      { id: "v11-1", label: "50g", optionValues: { Weight: "50g" }, price: 320, stock: 30 },
+      { id: "v11-2", label: "100g", optionValues: { Weight: "100g" }, price: 620, stock: 15 },
     ],
   },
   {
     id: "prod-12", name: "Zeera Sabat Safeed (White Cumin)", price: 150, stock: 50, categoryId: "cat-2",
     image: prodCumin, images: [prodCumin],
     status: "active", description: "Whole white cumin seeds", createdAt: "2025-03-10", rating: 4, priceRange: "₨ 150–₨ 450",
+    options: [{ id: "opt-12-1", name: "Weight", values: ["100g", "250g", "500g"] }],
     variants: [
-      { id: "v12-1", label: "100g", price: 150, stock: 50 },
-      { id: "v12-2", label: "250g", price: 350, stock: 25 },
-      { id: "v12-3", label: "500g", price: 450, stock: 10 },
+      { id: "v12-1", label: "100g", optionValues: { Weight: "100g" }, price: 150, stock: 50 },
+      { id: "v12-2", label: "250g", optionValues: { Weight: "250g" }, price: 350, stock: 25 },
+      { id: "v12-3", label: "500g", optionValues: { Weight: "500g" }, price: 450, stock: 10 },
     ],
   },
 ];
@@ -221,7 +241,7 @@ const defaultReviews: Review[] = [
   { id: "rev-6", productId: "prod-8", author: "Kamran Sheikh", rating: 5, text: "Best cardamom I've found online. Very fragrant and fresh.", status: "visible", createdAt: "2025-03-28" },
 ];
 
-const DATA_VERSION = "v2-webp";
+const DATA_VERSION = "v3-multi-variant";
 const VERSION_KEY = "admin_data_version";
 
 // Force refresh when data structure changes (e.g. new images)
