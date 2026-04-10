@@ -17,10 +17,23 @@ const ProductDetail = () => {
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const [qty, setQty] = useState(1);
-  const wishlisted = product ? isInWishlist(product.id) : false;
-
-  // Multi-option selection state: { "Size": "Small", "Color": "Blue" }
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
+
+  const wishlisted = product ? isInWishlist(product.id) : false;
+  const hasOptions = product?.options && product.options.length > 0;
+  const hasVariants = product?.variants && product.variants.length > 0;
+
+  const selectedVariant: ProductVariant | null = useMemo(() => {
+    if (!product || !hasVariants || !hasOptions) return null;
+    if (Object.keys(selectedOptions).length !== (product.options?.length || 0)) return null;
+    return product.variants?.find(v =>
+      product.options!.every(opt => v.optionValues[opt.name] === selectedOptions[opt.name])
+    ) || null;
+  }, [selectedOptions, product, hasVariants, hasOptions]);
+
+  const activePrice = selectedVariant ? selectedVariant.price : (product?.price || 0);
+  const activeCompare = selectedVariant?.compareAtPrice || product?.originalPrice;
+  const allImages = product?.images && product.images.length > 0 ? product.images : (product?.image ? [product.image] : []);
 
   if (!product) {
     return (
@@ -32,21 +45,7 @@ const ProductDetail = () => {
   }
 
   const related = products.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 4);
-  const hasOptions = product.options && product.options.length > 0;
-  const hasVariants = product.variants && product.variants.length > 0;
 
-  // Find matching variant based on selected options
-  const selectedVariant: ProductVariant | null = useMemo(() => {
-    if (!hasVariants || !hasOptions) return null;
-    if (Object.keys(selectedOptions).length !== (product.options?.length || 0)) return null;
-    return product.variants?.find(v =>
-      product.options!.every(opt => v.optionValues[opt.name] === selectedOptions[opt.name])
-    ) || null;
-  }, [selectedOptions, product, hasVariants, hasOptions]);
-
-  const activePrice = selectedVariant ? selectedVariant.price : product.price;
-  const activeCompare = selectedVariant?.compareAtPrice || product.originalPrice;
-  const allImages = product.images && product.images.length > 0 ? product.images : (product.image ? [product.image] : []);
 
   const handleSelectOption = (optionName: string, value: string) => {
     setSelectedOptions(prev => ({ ...prev, [optionName]: value }));
