@@ -241,7 +241,7 @@ const defaultReviews: Review[] = [
   { id: "rev-6", productId: "prod-8", author: "Kamran Sheikh", rating: 5, text: "Best cardamom I've found online. Very fragrant and fresh.", status: "visible", createdAt: "2025-03-28" },
 ];
 
-const DATA_VERSION = "v2-webp";
+const DATA_VERSION = "v3-multi-variant";
 const VERSION_KEY = "admin_data_version";
 
 // Force refresh when data structure changes (e.g. new images)
