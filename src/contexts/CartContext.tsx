@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { ProductVariant } from "@/data/dashboard-data";
+import { ProductVariant, ProductOption } from "@/data/dashboard-data";
 
 export interface Product {
   id: string;
@@ -13,6 +13,7 @@ export interface Product {
   images?: string[];
   priceRange?: string;
   originalPrice?: number;
+  options?: ProductOption[];
   variants?: ProductVariant[];
 }
 

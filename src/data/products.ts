@@ -25,6 +25,7 @@ function buildProducts(): Product[] {
       images: p.images || [p.image],
       priceRange: p.priceRange,
       originalPrice: p.compareAtPrice,
+      options: p.options,
       variants: p.variants,
     };
   });
