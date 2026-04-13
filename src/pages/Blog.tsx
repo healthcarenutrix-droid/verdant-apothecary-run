@@ -3,6 +3,15 @@ import { Link } from "react-router-dom";
 import { Calendar, Clock, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { blogPostsData, BlogPost } from "@/pages/BlogPost";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationEllipsis,
+} from "@/components/ui/pagination";
 
 const CATEGORIES = ["All", ...Array.from(new Set(blogPostsData.map(p => p.category)))];
 const POSTS_PER_PAGE = 6;
@@ -10,9 +19,8 @@ const POSTS_PER_PAGE = 6;
 const Blog = () => {
   const [activeCategory, setActiveCategory] = useState("All");
   const [heroIndex, setHeroIndex] = useState(0);
-  const [showAll, setShowAll] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  // Hero slider loops through ALL blog posts
   const allPosts = blogPostsData;
   const currentHero = allPosts[heroIndex];
 
@@ -23,7 +31,27 @@ const Blog = () => {
     ? blogPostsData
     : blogPostsData.filter(p => p.category === activeCategory);
 
-  const visiblePosts = showAll ? filteredPosts : filteredPosts.slice(0, POSTS_PER_PAGE);
+  const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
+  const paginatedPosts = filteredPosts.slice((currentPage - 1) * POSTS_PER_PAGE, currentPage * POSTS_PER_PAGE);
+
+  const handleCategoryChange = (cat: string) => {
+    setActiveCategory(cat);
+    setCurrentPage(1);
+  };
+
+  const getPageNumbers = () => {
+    const pages: (number | "ellipsis")[] = [];
+    if (totalPages <= 5) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (currentPage > 3) pages.push("ellipsis");
+      for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) pages.push(i);
+      if (currentPage < totalPages - 2) pages.push("ellipsis");
+      pages.push(totalPages);
+    }
+    return pages;
+  };
 
   return (
     <div>
@@ -32,7 +60,6 @@ const Blog = () => {
         <section className="relative bg-muted/30">
           <div className="max-w-7xl mx-auto px-4 lg:px-8 py-10 md:py-16">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-              {/* Text Side */}
               <div className="space-y-5 order-2 md:order-1">
                 <span className="inline-block bg-primary/10 text-primary text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
                   {currentHero.category}
@@ -49,8 +76,6 @@ const Blog = () => {
                     Read This Article <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </Link>
                 </Button>
-
-                {/* Slider controls */}
                 <div className="flex items-center gap-3 pt-4">
                   <Button variant="outline" size="icon" className="h-8 w-8 rounded-full" onClick={prevHero}>
                     <ChevronLeft className="h-4 w-4" />
@@ -71,8 +96,6 @@ const Blog = () => {
                   </Button>
                 </div>
               </div>
-
-              {/* Image Side */}
               <div className="order-1 md:order-2">
                 <Link to={`/blog/${currentHero.slug}`} className="block rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
                   <img
@@ -95,13 +118,16 @@ const Blog = () => {
           <h2 className="text-2xl font-bold text-foreground">
             Featured Articles, Picked Just For You
           </h2>
+          <span className="text-sm text-muted-foreground">
+            {filteredPosts.length} article{filteredPosts.length !== 1 ? "s" : ""}
+          </span>
         </div>
 
         <div className="flex flex-wrap gap-2 mb-8">
           {CATEGORIES.map(cat => (
             <button
               key={cat}
-              onClick={() => { setActiveCategory(cat); setShowAll(false); }}
+              onClick={() => handleCategoryChange(cat)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                 activeCategory === cat
                   ? "bg-primary text-primary-foreground shadow-sm"
@@ -113,30 +139,53 @@ const Blog = () => {
           ))}
         </div>
 
-        {/* Blog Grid */}
-        {visiblePosts.length > 0 ? (
+        {paginatedPosts.length > 0 ? (
           <>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Large first card */}
               <div className="md:row-span-2">
-                <BlogCard post={visiblePosts[0]} large />
+                <BlogCard post={paginatedPosts[0]} large />
               </div>
-              {visiblePosts.slice(1).map(post => (
+              {paginatedPosts.slice(1).map(post => (
                 <BlogCard key={post.slug} post={post} />
               ))}
             </div>
 
-            {/* View All Button */}
-            {!showAll && filteredPosts.length > POSTS_PER_PAGE && (
-              <div className="text-center mt-10">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={() => setShowAll(true)}
-                  className="px-8"
-                >
-                  View All Articles ({filteredPosts.length})
-                </Button>
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-10">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious
+                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                        className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      />
+                    </PaginationItem>
+                    {getPageNumbers().map((page, i) =>
+                      page === "ellipsis" ? (
+                        <PaginationItem key={`e-${i}`}>
+                          <PaginationEllipsis />
+                        </PaginationItem>
+                      ) : (
+                        <PaginationItem key={page}>
+                          <PaginationLink
+                            isActive={currentPage === page}
+                            onClick={() => setCurrentPage(page)}
+                            className="cursor-pointer"
+                          >
+                            {page}
+                          </PaginationLink>
+                        </PaginationItem>
+                      )
+                    )}
+                    <PaginationItem>
+                      <PaginationNext
+                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
               </div>
             )}
           </>
