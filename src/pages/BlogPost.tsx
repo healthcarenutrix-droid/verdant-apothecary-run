@@ -250,7 +250,7 @@ const BlogPostPage = () => {
     );
   }
 
-  const relatedPosts = blogPostsData.filter(p => p.slug !== slug).slice(0, 3);
+  const recentPosts = blogPostsData.filter(p => p.slug !== slug).slice(0, 4);
 
   return (
     <div>
@@ -267,62 +267,101 @@ const BlogPostPage = () => {
         </div>
       </section>
 
-      {/* Hero Image */}
-      <div className="w-full h-64 md:h-96 overflow-hidden">
-        <img src={post.image} alt={post.title} className="w-full h-full object-cover" />
-      </div>
+      {/* Main Layout: Content + Sidebar */}
+      <div className="max-w-7xl mx-auto px-4 py-10">
+        <div className="flex flex-col lg:flex-row gap-10">
+          {/* Main Content */}
+          <article className="flex-1 min-w-0">
+            {/* Title */}
+            <h1 className="text-2xl md:text-4xl font-bold text-foreground leading-tight mb-6">
+              {post.title}
+            </h1>
 
-      {/* Content */}
-      <article className="max-w-3xl mx-auto px-4 py-10">
-        <div className="space-y-4 mb-8">
-          <span className="inline-block bg-primary/10 text-primary text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
-            {post.category}
-          </span>
-          <h1 className="text-2xl md:text-4xl font-bold text-foreground leading-tight">{post.title}</h1>
-          <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-            <span className="flex items-center gap-1.5"><User className="h-3.5 w-3.5" /> {post.author}</span>
-            <span className="flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" /> {post.date}</span>
-            <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" /> {post.readTime}</span>
-          </div>
-        </div>
+            {/* Separator */}
+            <hr className="border-border mb-6" />
 
-        <div className="prose prose-sm max-w-none">
-          {post.content.split("\n\n").map((para, i) => (
-            <p key={i} className="mb-5 text-muted-foreground leading-relaxed text-base">{para}</p>
-          ))}
-        </div>
+            {/* Intro paragraph (first paragraph) */}
+            {(() => {
+              const paragraphs = post.content.split("\n\n");
+              const firstPara = paragraphs[0];
+              const restParas = paragraphs.slice(1);
+              return (
+                <>
+                  <p className="mb-8 text-muted-foreground leading-relaxed text-base text-justify">
+                    {firstPara}
+                  </p>
 
-        <div className="mt-12 pt-6 border-t border-border">
-          <Button asChild variant="outline">
-            <Link to="/blog"><ArrowLeft className="h-4 w-4 mr-2" /> Back to Blog</Link>
-          </Button>
-        </div>
-      </article>
-
-      {/* Related Articles */}
-      {relatedPosts.length > 0 && (
-        <section className="bg-muted/30 py-12">
-          <div className="max-w-7xl mx-auto px-4">
-            <h2 className="text-2xl font-bold mb-8">Related Articles</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {relatedPosts.map(rp => (
-                <Link to={`/blog/${rp.slug}`} key={rp.slug} className="group bg-card rounded-xl overflow-hidden border border-border hover:shadow-lg transition-all duration-300">
-                  <div className="h-48 overflow-hidden">
-                    <img src={rp.image} alt={rp.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  {/* Centered Featured Image */}
+                  <div className="flex justify-center mb-8">
+                    <img
+                      src={post.image}
+                      alt={post.title}
+                      className="rounded-lg max-w-full h-auto max-h-[500px] object-cover"
+                    />
                   </div>
-                  <div className="p-4">
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground mb-2">
-                      <span>{rp.date}</span>
-                      <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{rp.readTime}</span>
-                    </div>
-                    <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2">{rp.title}</h3>
+
+                  {/* Rest of content */}
+                  <div className="prose prose-sm max-w-none">
+                    {restParas.map((para, i) => (
+                      <p key={i} className="mb-5 text-muted-foreground leading-relaxed text-base text-justify">
+                        {para}
+                      </p>
+                    ))}
                   </div>
+                </>
+              );
+            })()}
+
+            {/* Meta info */}
+            <div className="mt-8 pt-6 border-t border-border flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+              <span className="inline-block bg-primary/10 text-primary text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
+                {post.category}
+              </span>
+              <span className="flex items-center gap-1.5"><User className="h-3.5 w-3.5" /> {post.author}</span>
+              <span className="flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" /> {post.date}</span>
+              <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" /> {post.readTime}</span>
+            </div>
+
+            <div className="mt-6">
+              <Button asChild variant="outline">
+                <Link to="/blog"><ArrowLeft className="h-4 w-4 mr-2" /> Back to Blog</Link>
+              </Button>
+            </div>
+          </article>
+
+          {/* Sidebar */}
+          <aside className="w-full lg:w-[300px] shrink-0">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-foreground mb-6">
+              Recent Blogs
+            </h2>
+            <div className="space-y-6">
+              {recentPosts.map(rp => (
+                <Link
+                  to={`/blog/${rp.slug}`}
+                  key={rp.slug}
+                  className="group block"
+                >
+                  <div className="rounded-lg overflow-hidden mb-2">
+                    <img
+                      src={rp.image}
+                      alt={rp.title}
+                      loading="lazy"
+                      className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
+                    <span>{rp.date}</span>
+                    <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{rp.readTime}</span>
+                  </div>
+                  <h3 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors line-clamp-2">
+                    {rp.title}
+                  </h3>
                 </Link>
               ))}
             </div>
-          </div>
-        </section>
-      )}
+          </aside>
+        </div>
+      </div>
     </div>
   );
 };
