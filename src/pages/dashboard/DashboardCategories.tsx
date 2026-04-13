@@ -173,7 +173,7 @@ const DashboardCategories = () => {
                     <Badge variant={c.status === "active" ? "default" : "outline"} className="capitalize">{c.status}</Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex justify-end gap-1">
                       <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => { setEditing(c); setFormOpen(true); }}>
                         <Pencil className="h-4 w-4" />
                       </Button>
