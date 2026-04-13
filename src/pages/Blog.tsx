@@ -141,11 +141,8 @@ const Blog = () => {
 
         {paginatedPosts.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="md:row-span-2">
-                <BlogCard post={paginatedPosts[0]} large />
-              </div>
-              {paginatedPosts.slice(1).map(post => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {paginatedPosts.map(post => (
                 <BlogCard key={post.slug} post={post} />
               ))}
             </div>
