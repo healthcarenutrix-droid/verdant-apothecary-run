@@ -237,9 +237,23 @@ At MSUR Herbs, our black pepper is sourced from premium growing regions and care
   },
 ];
 
+// Merge dashboard posts with static data for frontend display
+function getAllBlogPosts(): BlogPost[] {
+  const dashPosts = getBlogPosts().filter(p => p.status === "published");
+  const dashSlugs = new Set(dashPosts.map(p => p.slug));
+  const staticOnly = blogPostsData.filter(p => !dashSlugs.has(p.slug));
+  const mapped: BlogPost[] = dashPosts.map(dp => ({
+    slug: dp.slug, title: dp.title, category: dp.category, date: dp.date,
+    readTime: dp.readTime, author: dp.author, excerpt: dp.excerpt,
+    image: dp.image, featured: dp.featured, content: dp.content,
+  }));
+  return [...mapped, ...staticOnly];
+}
+
 const BlogPostPage = () => {
   const { slug } = useParams();
-  const post = blogPostsData.find((p) => p.slug === slug);
+  const allPosts = getAllBlogPosts();
+  const post = allPosts.find((p) => p.slug === slug);
 
   if (!post) {
     return (
@@ -250,7 +264,7 @@ const BlogPostPage = () => {
     );
   }
 
-  const recentPosts = blogPostsData.filter(p => p.slug !== slug).slice(0, 4);
+  const recentPosts = allPosts.filter(p => p.slug !== slug).slice(0, 4);
 
   return (
     <div>
