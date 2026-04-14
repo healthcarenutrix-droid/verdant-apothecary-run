@@ -317,7 +317,106 @@ export const addMessage = (m: ContactMessage) => { const all = getMessages(); al
 export const updateMessage = (m: ContactMessage) => { const all = getMessages().map(x => x.id === m.id ? m : x); saveMessages(all); };
 export const deleteMessage = (id: string) => { saveMessages(getMessages().filter(x => x.id !== id)); };
 
+// Blog Posts
+export interface AdminBlogPost {
+  id: string;
+  slug: string;
+  title: string;
+  category: string;
+  date: string;
+  readTime: string;
+  author: string;
+  excerpt: string;
+  image: string;
+  featured?: boolean;
+  content: string;
+  status: "published" | "draft";
+  createdAt: string;
+}
+
+const defaultBlogPosts: AdminBlogPost[] = [
+  {
+    id: "blog-1", slug: "turmeric-golden-spice-health-benefits",
+    title: "Turmeric: The Golden Spice and Its Amazing Health Benefits",
+    category: "Wellness", date: "March 15, 2026", readTime: "5 Min Read", author: "MSUR Herbs",
+    excerpt: "Discover why turmeric has been a cornerstone of traditional medicine for thousands of years and how it can boost your daily wellness routine.",
+    image: "/placeholder.svg", featured: true, status: "published", createdAt: "2026-03-15",
+    content: `Turmeric, often called the "Golden Spice," has been used in South Asian traditional medicine for over 4,000 years. Its active compound, curcumin, is responsible for both its vibrant yellow color and its powerful health benefits.\n\nResearch has shown that curcumin possesses strong anti-inflammatory and antioxidant properties. It can help manage oxidative and inflammatory conditions, metabolic syndrome, arthritis, and even anxiety. Adding turmeric to your daily diet is simpler than you might think.\n\nOne of the most popular ways to consume turmeric is through "golden milk" — a warm beverage made with milk, turmeric, black pepper (which enhances curcumin absorption by up to 2000%), and a touch of honey. This soothing drink has become a global wellness staple.\n\nYou can also add turmeric to your curries, rice dishes, smoothies, and even scrambled eggs. At MSUR Herbs, we source our turmeric directly from farmers who use traditional cultivation methods, ensuring the highest curcumin content in every batch.\n\nFor maximum benefits, always pair turmeric with a pinch of black pepper and a healthy fat like coconut oil or ghee. This combination significantly improves your body's ability to absorb curcumin.`,
+  },
+  {
+    id: "blog-2", slug: "herbal-teas-for-better-sleep",
+    title: "5 Herbal Teas That Will Transform Your Sleep Quality",
+    category: "Wellness", date: "March 08, 2026", readTime: "4 Min Read", author: "MSUR Herbs",
+    excerpt: "Struggling with sleep? These five natural herbal teas can help you relax, unwind, and enjoy deeper, more restful nights.",
+    image: "/placeholder.svg", status: "published", createdAt: "2026-03-08",
+    content: `Quality sleep is the foundation of good health, yet millions struggle with it every night. Before reaching for sleep medications, consider the gentle power of herbal teas — nature's own sleep remedy.\n\nChamomile tea is perhaps the most well-known sleep aid. It contains apigenin, an antioxidant that binds to certain receptors in the brain to promote sleepiness and reduce insomnia.\n\nValerian root tea has been used since ancient Greek and Roman times. Studies suggest it can help you fall asleep faster and improve overall sleep quality.\n\nLavender tea offers more than just a pleasant aroma. Research indicates that inhaling lavender while drinking the tea creates a dual calming effect.\n\nPassionflower tea increases gamma-aminobutyric acid (GABA) levels in the brain, which helps lower brain activity and promotes calm.\n\nAshwagandha tea, a staple in Ayurvedic medicine, helps the body manage stress — one of the biggest barriers to quality sleep.`,
+  },
+  {
+    id: "blog-3", slug: "ayurvedic-herbs-modern-wellness",
+    title: "Ancient Ayurvedic Herbs for Modern Wellness",
+    category: "Herbs", date: "February 28, 2026", readTime: "6 Min Read", author: "MSUR Herbs",
+    excerpt: "Bridge the gap between ancient wisdom and modern science with these powerful Ayurvedic herbs that are backed by research.",
+    image: "/placeholder.svg", featured: true, status: "published", createdAt: "2026-02-28",
+    content: `Ayurveda, the 5,000-year-old system of natural healing from India, has experienced a remarkable resurgence in modern wellness circles.\n\nAshwagandha (Withania somnifera) is perhaps the most studied Ayurvedic herb. Known as an adaptogen, it helps the body resist physical and mental stress.\n\nNeem, often called the "village pharmacy" in South Asia, has powerful antibacterial, antifungal, and anti-inflammatory properties.\n\nBrahmi (Bacopa monnieri) has been used for centuries to enhance cognitive function.\n\nTriphala, a combination of three fruits, is a gentle yet effective digestive tonic.`,
+  },
+  {
+    id: "blog-4", slug: "honey-ginger-winter-remedies",
+    title: "Honey & Ginger: Your Ultimate Winter Wellness Duo",
+    category: "Remedies", date: "February 20, 2026", readTime: "3 Min Read", author: "MSUR Herbs",
+    excerpt: "When winter arrives, this powerful combination of honey and ginger becomes your best defense against seasonal ailments.",
+    image: "/placeholder.svg", status: "published", createdAt: "2026-02-20",
+    content: `As temperatures drop, our bodies become more susceptible to colds, flu, and general winter malaise. Two of nature's most potent ingredients — honey and ginger — have been trusted remedies for centuries.\n\nGinger contains gingerol, a bioactive compound with powerful anti-inflammatory and antioxidant effects.\n\nRaw honey is a natural antibacterial and antiviral agent. It soothes sore throats, suppresses coughs, and provides quick energy.\n\nTogether, they create a synergistic effect that is greater than either ingredient alone.`,
+  },
+  {
+    id: "blog-5", slug: "health-benefits-dry-fruits-nuts",
+    title: "Top 8 Health Benefits of Dry Fruits & Nuts You Should Know",
+    category: "Nutrition", date: "February 12, 2026", readTime: "5 Min Read", author: "MSUR Herbs",
+    excerpt: "From heart health to brain function, discover the science-backed benefits of including dry fruits and nuts in your daily diet.",
+    image: "/placeholder.svg", status: "published", createdAt: "2026-02-12",
+    content: `Dry fruits and nuts are nutritional powerhouses packed into small, delicious packages.\n\nHeart health is perhaps the most well-documented benefit. Almonds, walnuts, and pistachios are rich in unsaturated fats.\n\nBrain function benefits significantly from regular nut consumption.\n\nWeight management may seem counterintuitive given their calorie density, but research consistently shows that nut consumers tend to have lower body weights.`,
+  },
+  {
+    id: "blog-6", slug: "traditional-herbal-remedies-guide",
+    title: "A Complete Guide to Traditional Herbal Remedies",
+    category: "Guides", date: "January 30, 2026", readTime: "7 Min Read", author: "MSUR Herbs",
+    excerpt: "From kitchen spices to powerful medicinal herbs, learn how our ancestors used plants for healing — and how you can too.",
+    image: "/placeholder.svg", status: "published", createdAt: "2026-01-30",
+    content: `Traditional herbal remedies represent thousands of years of accumulated wisdom about the healing power of plants.\n\nCumin and coriander, common kitchen spices, are powerful digestive aids.\n\nBlack seed (Nigella sativa) has been called "the remedy for everything except death."\n\nSaffron offers benefits that justify its premium status.`,
+  },
+  {
+    id: "blog-7", slug: "natural-skincare-herbs-oils",
+    title: "Natural Skincare: Best Herbs & Oils for Glowing Skin",
+    category: "Beauty", date: "January 22, 2026", readTime: "4 Min Read", author: "MSUR Herbs",
+    excerpt: "Ditch the chemicals and embrace nature's own skincare ingredients.",
+    image: "/placeholder.svg", status: "published", createdAt: "2026-01-22",
+    content: `The beauty industry has come full circle. After decades of synthetic formulations, there's a growing movement back to natural, plant-based skincare.\n\nNeem oil is one of the most powerful natural skincare ingredients available.\n\nTurmeric face masks have been a bridal beauty ritual in South Asia for centuries.\n\nRose water is a natural toner that balances skin pH.`,
+  },
+  {
+    id: "blog-8", slug: "spice-market-buying-guide",
+    title: "How to Buy Authentic Spices: A Complete Buyer's Guide",
+    category: "Guides", date: "January 10, 2026", readTime: "5 Min Read", author: "MSUR Herbs",
+    excerpt: "Learn how to identify high-quality spices, avoid adulteration, and store your spice collection for maximum flavor and potency.",
+    image: "/placeholder.svg", status: "published", createdAt: "2026-01-10",
+    content: `The difference between a good dish and a great dish often comes down to the quality of spices used.\n\nColor is your first clue, but it can be misleading.\n\nAroma tells a powerful story. Fresh, high-quality spices have a strong, distinct fragrance.\n\nBuy whole spices whenever possible and grind them yourself.`,
+  },
+  {
+    id: "blog-9", slug: "black-pepper-king-of-spices",
+    title: "Black Pepper: Why It's Called the King of Spices",
+    category: "Spices", date: "December 28, 2025", readTime: "4 Min Read", author: "MSUR Herbs",
+    excerpt: "From ancient trade routes to modern kitchens, black pepper has held its crown as the world's most important spice for millennia.",
+    image: "/placeholder.svg", status: "published", createdAt: "2025-12-28",
+    content: `Black pepper (Piper nigrum) has been the world's most traded spice for over 4,000 years.\n\nThe compound responsible for pepper's signature heat is piperine. Beyond flavor, piperine has remarkable health properties.\n\nThere's a significant difference between pre-ground pepper and freshly cracked peppercorns.\n\nDifferent varieties offer different flavor profiles.`,
+  },
+];
+
+export const getBlogPosts = (): AdminBlogPost[] => getStore("admin_blog_posts", defaultBlogPosts);
+export const saveBlogPosts = (b: AdminBlogPost[]) => setStore("admin_blog_posts", b);
+export const addBlogPost = (b: AdminBlogPost) => { const all = getBlogPosts(); all.push(b); saveBlogPosts(all); };
+export const updateBlogPost = (b: AdminBlogPost) => { const all = getBlogPosts().map(x => x.id === b.id ? b : x); saveBlogPosts(all); };
+export const deleteBlogPost = (id: string) => { saveBlogPosts(getBlogPosts().filter(x => x.id !== id)); };
+
 // Reset to defaults
 export const resetProducts = () => { localStorage.removeItem("admin_products"); };
 export const resetCategories = () => { localStorage.removeItem("admin_categories"); };
 export const resetReviews = () => { localStorage.removeItem("admin_reviews"); };
+export const resetBlogPosts = () => { localStorage.removeItem("admin_blog_posts"); };
