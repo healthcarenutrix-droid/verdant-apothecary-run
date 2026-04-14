@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Calendar, Clock, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getBlogPosts, AdminBlogPost } from "@/data/dashboard-data";
 import { blogPostsData, BlogPost } from "@/pages/BlogPost";
-import {
   Pagination,
   PaginationContent,
   PaginationItem,
@@ -17,11 +17,12 @@ const CATEGORIES = ["All", ...Array.from(new Set(blogPostsData.map(p => p.catego
 const POSTS_PER_PAGE = 6;
 
 const Blog = () => {
+  const allPosts = getAllPosts();
+  const CATEGORIES = ["All", ...Array.from(new Set(allPosts.map(p => p.category)))];
   const [activeCategory, setActiveCategory] = useState("All");
   const [heroIndex, setHeroIndex] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const allPosts = blogPostsData;
   const currentHero = allPosts[heroIndex];
 
   const nextHero = () => setHeroIndex((heroIndex + 1) % allPosts.length);
