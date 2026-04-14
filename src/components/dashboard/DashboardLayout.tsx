@@ -11,12 +11,13 @@ const pageTitles: Record<string, string> = {
   "/dashboard/categories": "Categories",
   "/dashboard/orders": "Orders",
   "/dashboard/reviews": "Reviews",
+  "/dashboard/blogs": "Blog Posts",
 };
 
 const DashboardLayout = () => {
   const location = useLocation();
   const title = pageTitles[location.pathname] || "Dashboard";
-  const showAdd = ["/dashboard/products", "/dashboard/categories", "/dashboard/orders"].includes(location.pathname);
+  const showAdd = ["/dashboard/products", "/dashboard/categories", "/dashboard/orders", "/dashboard/blogs"].includes(location.pathname);
 
   return (
     <SidebarProvider>

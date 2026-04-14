@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Calendar, Clock, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getBlogPosts } from "@/data/dashboard-data";
 import { blogPostsData, BlogPost } from "@/pages/BlogPost";
 import {
   Pagination,
@@ -13,23 +14,43 @@ import {
   PaginationEllipsis,
 } from "@/components/ui/pagination";
 
-const CATEGORIES = ["All", ...Array.from(new Set(blogPostsData.map(p => p.category)))];
+// Merge dashboard blog posts with static ones, dashboard takes priority
+function getAllPosts(): BlogPost[] {
+  const dashPosts = getBlogPosts().filter(p => p.status === "published");
+  const dashSlugs = new Set(dashPosts.map(p => p.slug));
+  const staticOnly = blogPostsData.filter(p => !dashSlugs.has(p.slug));
+  const mapped: BlogPost[] = dashPosts.map(dp => ({
+    slug: dp.slug,
+    title: dp.title,
+    category: dp.category,
+    date: dp.date,
+    readTime: dp.readTime,
+    author: dp.author,
+    excerpt: dp.excerpt,
+    image: dp.image,
+    featured: dp.featured,
+    content: dp.content,
+  }));
+  return [...mapped, ...staticOnly];
+}
+
 const POSTS_PER_PAGE = 6;
 
 const Blog = () => {
+  const allPosts = getAllPosts();
+  const CATEGORIES = ["All", ...Array.from(new Set(allPosts.map(p => p.category)))];
   const [activeCategory, setActiveCategory] = useState("All");
   const [heroIndex, setHeroIndex] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const allPosts = blogPostsData;
   const currentHero = allPosts[heroIndex];
 
   const nextHero = () => setHeroIndex((heroIndex + 1) % allPosts.length);
   const prevHero = () => setHeroIndex((heroIndex - 1 + allPosts.length) % allPosts.length);
 
   const filteredPosts = activeCategory === "All"
-    ? blogPostsData
-    : blogPostsData.filter(p => p.category === activeCategory);
+    ? allPosts
+    : allPosts.filter(p => p.category === activeCategory);
 
   const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
   const paginatedPosts = filteredPosts.slice((currentPage - 1) * POSTS_PER_PAGE, currentPage * POSTS_PER_PAGE);
