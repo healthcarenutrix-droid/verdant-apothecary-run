@@ -103,7 +103,10 @@ const ProductDetail = () => {
 
             <div className="flex items-center gap-3">
               {activeCompare && (
-                <span className="text-lg text-muted-foreground line-through">₨ {activeCompare.toLocaleString()}</span>
+                <>
+                  <span className="bg-red-600 text-white text-xs font-bold px-2.5 py-1 rounded">Sale!</span>
+                  <span className="text-lg text-muted-foreground line-through">₨ {activeCompare.toLocaleString()}</span>
+                </>
               )}
               <span className={`text-2xl font-bold ${activeCompare ? "text-green-600" : "text-foreground"}`}>₨ {activePrice.toLocaleString()}</span>
               {selectedVariant && selectedVariant.stock <= 5 && selectedVariant.stock > 0 && (
