@@ -4,9 +4,10 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 interface ProductImageGalleryProps {
   images: string[];
   name: string;
+  onSale?: boolean;
 }
 
-const ProductImageGallery = ({ images, name }: ProductImageGalleryProps) => {
+const ProductImageGallery = ({ images, name, onSale }: ProductImageGalleryProps) => {
   const [selected, setSelected] = useState(0);
   const allImages = images.length > 0 ? images : [""];
 
@@ -17,6 +18,11 @@ const ProductImageGallery = ({ images, name }: ProductImageGalleryProps) => {
     <div className="space-y-3">
       {/* Main image */}
       <div className="relative bg-secondary rounded-lg overflow-hidden group">
+        {onSale && (
+          <span className="absolute top-3 left-3 z-10 bg-red-600 text-white text-xs font-bold px-2.5 py-1 rounded">
+            Sale!
+          </span>
+        )}
         <img
           src={allImages[selected]}
           alt={`${name} - Image ${selected + 1}`}
