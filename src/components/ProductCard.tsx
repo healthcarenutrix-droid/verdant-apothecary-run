@@ -28,7 +28,7 @@ const ProductCard = ({ product }: { product: Product }) => {
           className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-500"
         />
         {product.originalPrice && (
-          <span className="absolute top-3 left-3 bg-destructive text-destructive-foreground text-xs font-semibold px-2 py-1 rounded">
+          <span className="absolute top-3 left-3 bg-red-600 text-white text-xs font-bold px-2.5 py-1 rounded">
             Sale!
           </span>
         )}
@@ -50,9 +50,9 @@ const ProductCard = ({ product }: { product: Product }) => {
             <span className="text-sm text-muted-foreground line-through">₨ {product.originalPrice.toLocaleString()}</span>
           )}
           {product.priceRange ? (
-            <span className="text-sm font-semibold text-foreground">{product.priceRange}</span>
+            <span className={`text-sm font-semibold ${product.originalPrice ? "text-green-600" : "text-foreground"}`}>{product.priceRange}</span>
           ) : (
-            <span className="text-sm font-semibold text-foreground">₨ {product.price.toLocaleString()}</span>
+            <span className={`text-sm font-semibold ${product.originalPrice ? "text-green-600" : "text-foreground"}`}>₨ {product.price.toLocaleString()}</span>
           )}
         </div>
         <div className="pt-1">
