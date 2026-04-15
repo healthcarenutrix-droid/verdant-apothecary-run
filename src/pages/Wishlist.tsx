@@ -37,9 +37,9 @@ const Wishlist = () => {
                   )}
 
                   {product.priceRange ? (
-                    <span className="text-sm font-semibold text-foreground">{product.priceRange}</span>
+                    <span className={`text-sm font-semibold ${product.originalPrice ? "text-green-600" : "text-foreground"}`}>{product.priceRange}</span>
                   ) : (
-                    <span className="text-sm font-semibold text-foreground">₨ {product.price.toLocaleString()}</span>
+                    <span className={`text-sm font-semibold ${product.originalPrice ? "text-green-600" : "text-foreground"}`}>₨ {product.price.toLocaleString()}</span>
                   )}
                 </div>
               </div>
