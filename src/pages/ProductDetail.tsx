@@ -2,7 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { useState, useMemo } from "react";
 import { Star, Minus, Plus, ShoppingCart, ChevronRight, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { products } from "@/data/products";
@@ -111,7 +111,7 @@ const ProductDetail = () => {
               )}
             </div>
 
-            <p className="text-muted-foreground">{product.description}</p>
+            {/* Description moved to accordion below */}
 
             {/* Multi-Option Selectors */}
             {hasOptions && product.options!.map(option => (
@@ -191,22 +191,24 @@ const ProductDetail = () => {
               </p>
               <p><span className="text-muted-foreground">Availability:</span> <span className="text-primary font-medium">In Stock</span></p>
             </div>
+
+            {/* Accordion for Description & Reviews */}
+            <Accordion type="multiple" defaultValue={["description"]} className="w-full">
+              <AccordionItem value="description">
+                <AccordionTrigger className="text-base font-semibold">Description</AccordionTrigger>
+                <AccordionContent>
+                  <p className="text-muted-foreground leading-relaxed">{product.description}. Our products are 100% natural, lab tested, and sourced from premium quality herbs. We ensure that every product meets the highest standards of purity and effectiveness.</p>
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="reviews">
+                <AccordionTrigger className="text-base font-semibold">Reviews</AccordionTrigger>
+                <AccordionContent>
+                  <ProductReviews productId={product.id} />
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </div>
         </div>
-
-        {/* Tabs */}
-        <Tabs defaultValue="description" className="mt-12">
-          <TabsList className="border-b border-border w-full justify-start rounded-none bg-transparent p-0">
-            <TabsTrigger value="description" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent">Description</TabsTrigger>
-            <TabsTrigger value="reviews" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent">Reviews</TabsTrigger>
-          </TabsList>
-          <TabsContent value="description" className="py-6">
-            <p className="text-muted-foreground leading-relaxed">{product.description}. Our products are 100% natural, lab tested, and sourced from premium quality herbs. We ensure that every product meets the highest standards of purity and effectiveness.</p>
-          </TabsContent>
-          <TabsContent value="reviews" className="py-6">
-            <ProductReviews productId={product.id} />
-          </TabsContent>
-        </Tabs>
 
         {/* Related */}
         {related.length > 0 && (
