@@ -10,14 +10,8 @@ import { products, categoryObjects } from "@/data/products";
 import heroBg from "@/assets/hero-bg.jpg";
 import catSpices from "@/assets/cat-spices.webp";
 import blogBlackPepper from "@/assets/blog-black-pepper.webp";
-import blogGarlic from "@/assets/blog-garlic.webp";
-import blogSpicesGuide from "@/assets/blog-spices-guide.webp";
-
-const blogImageMap: Record<string, string> = {
-  "black-pepper-spice-beef-recipe": blogBlackPepper,
-  "garlicky-punch-and-finishes": blogGarlic,
-  "spices-subscription-guide": blogSpicesGuide,
-};
+import blogTurmeric from "@/assets/blog-turmeric.jpg";
+import blogHerbalTea from "@/assets/blog-herbal-tea.jpg";
 
 /* ─── Hero Slider ─── */
 const heroSlides = [
@@ -261,28 +255,31 @@ const NewSpices = () => (
 /* ─── Blog Preview ─── */
 const blogPosts = [
   {
-    slug: "black-pepper-spice-beef-recipe",
-    title: "Black Pepper Spice Beef Recipe",
-    category: "GardenFrost Puree",
-    date: "13 Feb",
-    excerpt: "Mole sauce are a magnificent mixture fragrant layered flavors, and we're honing...",
+    slug: "black-pepper-king-of-spices",
+    title: "Black Pepper: Why It's Called the King of Spices",
+    category: "Spices",
+    date: "28 Dec",
+    excerpt: "From ancient trade routes to modern kitchens, black pepper has held its crown as the world's most important spice for millennia.",
     views: 228,
+    image: blogBlackPepper,
   },
   {
-    slug: "garlicky-punch-and-finishes",
-    title: "Garlicky Punch and Finishes",
-    category: "Backpepper",
-    date: "21 Feb",
-    excerpt: "We combine famous carnitas flavor with herbaceous Indian spices...",
+    slug: "turmeric-golden-spice-health-benefits",
+    title: "Turmeric: The Golden Spice and Its Amazing Health Benefits",
+    category: "Wellness",
+    date: "15 Mar",
+    excerpt: "Discover why turmeric has been a cornerstone of traditional medicine for thousands of years.",
     views: 177,
+    image: blogTurmeric,
   },
   {
-    slug: "spices-subscription-guide",
-    title: "Spices Subscription Guide",
-    category: "Backpepper",
-    date: "17 Mar",
-    excerpt: "With blend we sought to capture the essence and introduce a new dimension...",
+    slug: "herbal-teas-for-better-sleep",
+    title: "5 Herbal Teas That Will Transform Your Sleep Quality",
+    category: "Wellness",
+    date: "08 Mar",
+    excerpt: "Struggling with sleep? These five natural herbal teas can help you relax and enjoy deeper, more restful nights.",
     views: 166,
+    image: blogHerbalTea,
   },
 ];
 
@@ -295,7 +292,7 @@ const BlogSection = () => (
       {blogPosts.map((post) => (
         <Link to={`/blog/${post.slug}`} key={post.title} className="group">
           <div className="h-48 rounded-lg overflow-hidden mb-4 bg-secondary relative">
-            <img src={blogImageMap[post.slug] || blogBlackPepper} alt={post.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            <img src={post.image} alt={post.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
             <span className="absolute bottom-3 left-3 bg-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded uppercase">
               {post.category}
             </span>
