@@ -317,11 +317,21 @@ const BlogPostPage = () => {
 
                   {/* Rest of content */}
                   <div className="prose prose-sm max-w-none">
-                    {restParas.map((para, i) => (
-                      <p key={i} className="mb-5 text-muted-foreground leading-relaxed text-base text-justify">
-                        {para}
-                      </p>
-                    ))}
+                    {restParas.map((para, i) => {
+                      const imgMatch = para.match(/^!\[.*?\]\((.*?)\)$/);
+                      if (imgMatch) {
+                        return (
+                          <div key={i} className="flex justify-center my-6">
+                            <img src={imgMatch[1]} alt="Blog content" className="rounded-lg max-w-full h-auto max-h-[400px] object-cover" />
+                          </div>
+                        );
+                      }
+                      return (
+                        <p key={i} className="mb-5 text-muted-foreground leading-relaxed text-base text-justify">
+                          {para}
+                        </p>
+                      );
+                    })}
                   </div>
                 </>
               );
