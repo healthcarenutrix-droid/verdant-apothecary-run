@@ -23,7 +23,6 @@ interface BlogFormDialogProps {
 
 const CATEGORIES = ["Wellness", "Herbs", "Remedies", "Nutrition", "Guides", "Beauty", "Spices"];
 
-// Rich text toolbar button
 const ToolbarBtn = ({ icon: Icon, label, onClick, active }: { icon: any; label: string; onClick: () => void; active?: boolean }) => (
   <button
     type="button"
@@ -50,20 +49,17 @@ const BlogFormDialog = ({ open, onOpenChange, post, onSave }: BlogFormDialogProp
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const contentRef = useRef<HTMLTextAreaElement>(null);
+  const inlineImageRef = useRef<HTMLInputElement>(null);
+  const [showInlineImageDialog, setShowInlineImageDialog] = useState(false);
+  const [inlineImageUrl, setInlineImageUrl] = useState("");
+  const [inlineImageMode, setInlineImageMode] = useState<"upload" | "url">("upload");
 
   useEffect(() => {
     if (post) {
-      setTitle(post.title);
-      setSlug(post.slug);
-      setCategory(post.category);
-      setAuthor(post.author);
-      setExcerpt(post.excerpt);
-      setContent(post.content);
-      setImage(post.image);
-      setReadTime(post.readTime);
-      setFeatured(post.featured || false);
-      setStatus(post.status);
-      setImageMode(post.image?.startsWith("http") ? "url" : "upload");
+      setTitle(post.title); setSlug(post.slug); setCategory(post.category);
+      setAuthor(post.author); setExcerpt(post.excerpt); setContent(post.content);
+      setImage(post.image); setReadTime(post.readTime); setFeatured(post.featured || false);
+      setStatus(post.status); setImageMode(post.image?.startsWith("http") ? "url" : "upload");
     } else {
       setTitle(""); setSlug(""); setCategory("Wellness"); setAuthor("MSUR Herbs");
       setExcerpt(""); setContent(""); setImage(""); setReadTime("5 Min Read");
@@ -78,7 +74,6 @@ const BlogFormDialog = ({ open, onOpenChange, post, onSave }: BlogFormDialogProp
     if (!post) setSlug(generateSlug(v));
   };
 
-  // Image upload handlers
   const handleFile = useCallback((file: File) => {
     if (!file.type.startsWith("image/")) return;
     if (file.size > 5 * 1024 * 1024) return;
@@ -88,12 +83,10 @@ const BlogFormDialog = ({ open, onOpenChange, post, onSave }: BlogFormDialogProp
   }, []);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setDragActive(false);
+    e.preventDefault(); setDragActive(false);
     if (e.dataTransfer.files?.[0]) handleFile(e.dataTransfer.files[0]);
   }, [handleFile]);
 
-  // Rich text formatting
   const insertFormatting = (before: string, after: string = "") => {
     const ta = contentRef.current;
     if (!ta) return;
@@ -102,10 +95,7 @@ const BlogFormDialog = ({ open, onOpenChange, post, onSave }: BlogFormDialogProp
     const selected = content.substring(start, end);
     const newContent = content.substring(0, start) + before + selected + after + content.substring(end);
     setContent(newContent);
-    setTimeout(() => {
-      ta.focus();
-      ta.setSelectionRange(start + before.length, start + before.length + selected.length);
-    }, 0);
+    setTimeout(() => { ta.focus(); ta.setSelectionRange(start + before.length, start + before.length + selected.length); }, 0);
   };
 
   const insertBlock = (prefix: string) => {
@@ -118,6 +108,28 @@ const BlogFormDialog = ({ open, onOpenChange, post, onSave }: BlogFormDialogProp
     setTimeout(() => { ta.focus(); }, 0);
   };
 
+  const insertInlineImage = useCallback((url: string) => {
+    if (!url) return;
+    const ta = contentRef.current;
+    const pos = ta ? ta.selectionStart : content.length;
+    const imgMarkdown = `\n\n![image](${url})\n\n`;
+    const newContent = content.substring(0, pos) + imgMarkdown + content.substring(pos);
+    setContent(newContent);
+    setShowInlineImageDialog(false);
+    setInlineImageUrl("");
+    setTimeout(() => { ta?.focus(); }, 0);
+  }, [content]);
+
+  const handleInlineFileUpload = useCallback((file: File) => {
+    if (!file.type.startsWith("image/")) return;
+    if (file.size > 5 * 1024 * 1024) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (e.target?.result) insertInlineImage(e.target.result as string);
+    };
+    reader.readAsDataURL(file);
+  }, [insertInlineImage]);
+
   const handleSave = () => {
     if (!title.trim() || !content.trim()) return;
     const now = new Date();
@@ -125,16 +137,11 @@ const BlogFormDialog = ({ open, onOpenChange, post, onSave }: BlogFormDialogProp
     onSave({
       id: post?.id || `blog-${Date.now()}`,
       slug: slug || generateSlug(title),
-      title: title.trim(),
-      category,
-      date: post?.date || dateStr,
-      readTime,
-      author,
+      title: title.trim(), category,
+      date: post?.date || dateStr, readTime, author,
       excerpt: excerpt.trim(),
       image: image || "/placeholder.svg",
-      featured,
-      content: content.trim(),
-      status,
+      featured, content: content.trim(), status,
       createdAt: post?.createdAt || now.toISOString().split("T")[0],
     });
     onOpenChange(false);
@@ -145,9 +152,7 @@ const BlogFormDialog = ({ open, onOpenChange, post, onSave }: BlogFormDialogProp
       <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{post ? "Edit Blog Post" : "Create Blog Post"}</DialogTitle>
-          <DialogDescription>
-            {post ? "Update the blog post details below." : "Fill in the details to create a new blog post."}
-          </DialogDescription>
+          <DialogDescription>{post ? "Update the blog post details below." : "Fill in the details to create a new blog post."}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-5 py-2">
@@ -169,9 +174,7 @@ const BlogFormDialog = ({ open, onOpenChange, post, onSave }: BlogFormDialogProp
               <Label>Category</Label>
               <Select value={category} onValueChange={setCategory}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                </SelectContent>
+                <SelectContent>{CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
@@ -205,34 +208,19 @@ const BlogFormDialog = ({ open, onOpenChange, post, onSave }: BlogFormDialogProp
                 <ImageIcon className="h-3 w-3 mr-1" /> URL
               </Button>
             </div>
-
             {imageMode === "upload" ? (
               <div
                 onDrop={handleDrop}
                 onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
                 onDragLeave={() => setDragActive(false)}
                 onClick={() => fileInputRef.current?.click()}
-                className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
-                  dragActive ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
-                }`}
+                className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${dragActive ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}`}
               >
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => { if (e.target.files?.[0]) handleFile(e.target.files[0]); }}
-                />
+                <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={(e) => { if (e.target.files?.[0]) handleFile(e.target.files[0]); }} />
                 {image ? (
                   <div className="relative inline-block">
                     <img src={image} alt="Preview" className="w-32 h-20 object-cover rounded-lg mx-auto" />
-                    <button
-                      type="button"
-                      onClick={(e) => { e.stopPropagation(); setImage(""); }}
-                      className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
+                    <button type="button" onClick={(e) => { e.stopPropagation(); setImage(""); }} className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1"><X className="h-3 w-3" /></button>
                   </div>
                 ) : (
                   <>
@@ -244,17 +232,11 @@ const BlogFormDialog = ({ open, onOpenChange, post, onSave }: BlogFormDialogProp
               </div>
             ) : (
               <div className="space-y-2">
-                <Input
-                  placeholder="https://example.com/image.jpg"
-                  value={image?.startsWith("data:") ? "" : image}
-                  onChange={(e) => setImage(e.target.value)}
-                />
+                <Input placeholder="https://example.com/image.jpg" value={image?.startsWith("data:") ? "" : image} onChange={(e) => setImage(e.target.value)} />
                 {image && !image.startsWith("data:") && (
                   <div className="relative inline-block">
                     <img src={image} alt="Preview" className="w-32 h-20 object-cover rounded-lg" />
-                    <button type="button" onClick={() => setImage("")} className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1">
-                      <X className="h-3 w-3" />
-                    </button>
+                    <button type="button" onClick={() => setImage("")} className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1"><X className="h-3 w-3" /></button>
                   </div>
                 )}
               </div>
@@ -271,7 +253,6 @@ const BlogFormDialog = ({ open, onOpenChange, post, onSave }: BlogFormDialogProp
           <div className="space-y-2">
             <Label>Content *</Label>
             <div className="border border-border rounded-lg overflow-hidden">
-              {/* Toolbar */}
               <div className="flex flex-wrap items-center gap-0.5 p-2 bg-muted/50 border-b border-border">
                 <ToolbarBtn icon={Bold} label="Bold" onClick={() => insertFormatting("**", "**")} />
                 <ToolbarBtn icon={Italic} label="Italic" onClick={() => insertFormatting("*", "*")} />
@@ -287,8 +268,9 @@ const BlogFormDialog = ({ open, onOpenChange, post, onSave }: BlogFormDialogProp
                 <Separator orientation="vertical" className="h-6 mx-1" />
                 <ToolbarBtn icon={LinkIcon} label="Link" onClick={() => insertFormatting("[", "](url)")} />
                 <ToolbarBtn icon={Minus} label="Horizontal Rule" onClick={() => insertFormatting("\n\n---\n\n")} />
+                <Separator orientation="vertical" className="h-6 mx-1" />
+                <ToolbarBtn icon={ImageIcon} label="Insert Image" onClick={() => setShowInlineImageDialog(true)} />
               </div>
-              {/* Editor */}
               <Textarea
                 ref={contentRef}
                 value={content}
@@ -299,9 +281,44 @@ const BlogFormDialog = ({ open, onOpenChange, post, onSave }: BlogFormDialogProp
               />
             </div>
             <p className="text-xs text-muted-foreground">
-              Supports Markdown: **bold**, *italic*, # headings, - lists, &gt; quotes, [links](url)
+              Supports Markdown: **bold**, *italic*, # headings, - lists, &gt; quotes, [links](url), ![image](url)
             </p>
           </div>
+
+          {/* Inline Image Insert Panel */}
+          {showInlineImageDialog && (
+            <div className="border border-border rounded-lg p-4 bg-muted/30 space-y-3">
+              <div className="flex items-center justify-between">
+                <Label className="text-sm font-semibold">Insert Image into Content</Label>
+                <button type="button" onClick={() => { setShowInlineImageDialog(false); setInlineImageUrl(""); }} className="text-muted-foreground hover:text-foreground">
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+              <div className="flex gap-2">
+                <Button type="button" size="sm" variant={inlineImageMode === "upload" ? "default" : "outline"} onClick={() => setInlineImageMode("upload")} className="text-xs">
+                  <Upload className="h-3 w-3 mr-1" /> Upload
+                </Button>
+                <Button type="button" size="sm" variant={inlineImageMode === "url" ? "default" : "outline"} onClick={() => setInlineImageMode("url")} className="text-xs">
+                  <ImageIcon className="h-3 w-3 mr-1" /> URL
+                </Button>
+              </div>
+              {inlineImageMode === "upload" ? (
+                <div
+                  onClick={() => inlineImageRef.current?.click()}
+                  className="border-2 border-dashed rounded-lg p-4 text-center cursor-pointer hover:border-primary/50 transition-colors"
+                >
+                  <input ref={inlineImageRef} type="file" accept="image/*" className="hidden" onChange={(e) => { if (e.target.files?.[0]) handleInlineFileUpload(e.target.files[0]); }} />
+                  <Upload className="h-6 w-6 text-muted-foreground mx-auto mb-1" />
+                  <p className="text-xs text-muted-foreground">Click to upload an image (PNG, JPG up to 5MB)</p>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <Input placeholder="https://example.com/image.jpg" value={inlineImageUrl} onChange={(e) => setInlineImageUrl(e.target.value)} className="flex-1" />
+                  <Button type="button" size="sm" onClick={() => insertInlineImage(inlineImageUrl)} disabled={!inlineImageUrl.trim()}>Insert</Button>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Featured toggle */}
           <div className="flex items-center gap-3">
@@ -312,9 +329,7 @@ const BlogFormDialog = ({ open, onOpenChange, post, onSave }: BlogFormDialogProp
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button onClick={handleSave} disabled={!title.trim() || !content.trim()}>
-            {post ? "Update" : "Create"}
-          </Button>
+          <Button onClick={handleSave} disabled={!title.trim() || !content.trim()}>{post ? "Update" : "Create"}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
