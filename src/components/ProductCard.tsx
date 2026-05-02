@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,12 @@ const ProductCard = ({ product }: { product: Product }) => {
   const hasVariants = !!(product.variants && product.variants.length > 0) || !!product.priceRange;
   const wishlisted = isInWishlist(product.id);
 
+  const gallery = (product.images && product.images.length > 0)
+    ? product.images
+    : product.image ? [product.image] : [];
+  const [activeIdx, setActiveIdx] = useState(0);
+  const displayImage = gallery[activeIdx] || product.image;
+
   const toggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -20,7 +27,7 @@ const ProductCard = ({ product }: { product: Product }) => {
     <div className="product-card group">
       <Link to={`/product/${product.id}`} className="block relative overflow-hidden bg-secondary">
         <img
-          src={product.image}
+          src={displayImage}
           alt={product.name}
           loading="lazy"
           width={300}
@@ -39,6 +46,23 @@ const ProductCard = ({ product }: { product: Product }) => {
           <Heart className={`h-4 w-4 ${wishlisted ? "fill-destructive text-destructive" : "text-foreground"}`} />
         </button>
       </Link>
+      {gallery.length > 1 && (
+        <div className="flex gap-1.5 px-4 pt-3 opacity-0 group-hover:opacity-100 transition-opacity">
+          {gallery.slice(0, 4).map((img, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onMouseEnter={() => setActiveIdx(idx)}
+              onClick={(e) => { e.preventDefault(); setActiveIdx(idx); }}
+              className={`w-10 h-10 rounded border-2 overflow-hidden transition-all ${
+                activeIdx === idx ? "border-primary" : "border-border hover:border-primary/50"
+              }`}
+            >
+              <img src={img} alt={`${product.name} ${idx + 1}`} className="w-full h-full object-cover" />
+            </button>
+          ))}
+        </div>
+      )}
       <div className="p-4 space-y-2">
         <Link to={`/product/${product.id}`}>
           <h3 className="text-sm font-medium text-foreground leading-snug line-clamp-2 group-hover:text-primary transition-colors">

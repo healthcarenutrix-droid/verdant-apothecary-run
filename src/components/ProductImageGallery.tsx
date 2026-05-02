@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useState, useRef, MouseEvent } from "react";
+import { ChevronLeft, ChevronRight, ZoomIn, X } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 interface ProductImageGalleryProps {
   images: string[];
@@ -9,36 +10,63 @@ interface ProductImageGalleryProps {
 
 const ProductImageGallery = ({ images, name, onSale }: ProductImageGalleryProps) => {
   const [selected, setSelected] = useState(0);
+  const [zoomOpen, setZoomOpen] = useState(false);
+  const [lens, setLens] = useState<{ x: number; y: number; show: boolean }>({ x: 50, y: 50, show: false });
+  const containerRef = useRef<HTMLDivElement>(null);
   const allImages = images.length > 0 ? images : [""];
 
   const goNext = () => setSelected((s) => (s + 1) % allImages.length);
   const goPrev = () => setSelected((s) => (s - 1 + allImages.length) % allImages.length);
 
+  const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    setLens({ x, y, show: true });
+  };
+
   return (
     <div className="space-y-3">
       {/* Main image */}
-      <div className="relative bg-secondary rounded-lg overflow-hidden group">
+      <div
+        ref={containerRef}
+        className="relative bg-secondary rounded-lg overflow-hidden group cursor-zoom-in"
+        onMouseEnter={() => setLens((l) => ({ ...l, show: true }))}
+        onMouseLeave={() => setLens((l) => ({ ...l, show: false }))}
+        onMouseMove={handleMouseMove}
+        onClick={() => setZoomOpen(true)}
+      >
         {onSale && (
           <span className="absolute top-3 left-3 z-10 bg-red-600 text-white text-xs font-bold px-2.5 py-1 rounded">
             Sale!
           </span>
         )}
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); setZoomOpen(true); }}
+          className="absolute top-3 right-3 z-10 bg-card/80 hover:bg-card rounded-full p-2 transition-colors"
+          aria-label="Open zoom"
+        >
+          <ZoomIn className="h-4 w-4" />
+        </button>
         <img
           src={allImages[selected]}
           alt={`${name} - Image ${selected + 1}`}
-          className="w-full aspect-square object-cover"
+          className="w-full aspect-square object-cover transition-transform duration-200"
+          style={lens.show ? { transform: "scale(1.6)", transformOrigin: `${lens.x}% ${lens.y}%` } : undefined}
         />
         {allImages.length > 1 && (
           <>
             <button
-              onClick={goPrev}
-              className="absolute left-2 top-1/2 -translate-y-1/2 bg-card/80 hover:bg-card rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={(e) => { e.stopPropagation(); goPrev(); }}
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-card/80 hover:bg-card rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity z-10"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
             <button
-              onClick={goNext}
-              className="absolute right-2 top-1/2 -translate-y-1/2 bg-card/80 hover:bg-card rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={(e) => { e.stopPropagation(); goNext(); }}
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-card/80 hover:bg-card rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity z-10"
             >
               <ChevronRight className="h-5 w-5" />
             </button>
@@ -62,6 +90,43 @@ const ProductImageGallery = ({ images, name, onSale }: ProductImageGalleryProps)
           ))}
         </div>
       )}
+
+      {/* Fullscreen zoom dialog */}
+      <Dialog open={zoomOpen} onOpenChange={setZoomOpen}>
+        <DialogContent className="max-w-5xl p-0 bg-background border-0">
+          <div className="relative">
+            <button
+              onClick={() => setZoomOpen(false)}
+              className="absolute top-3 right-3 z-10 bg-card/90 hover:bg-card rounded-full p-2"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <div className="overflow-auto max-h-[85vh]">
+              <img
+                src={allImages[selected]}
+                alt={`${name} - zoom`}
+                className="w-full h-auto object-contain"
+              />
+            </div>
+            {allImages.length > 1 && (
+              <>
+                <button
+                  onClick={goPrev}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 bg-card/90 hover:bg-card rounded-full p-2"
+                >
+                  <ChevronLeft className="h-6 w-6" />
+                </button>
+                <button
+                  onClick={goNext}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 bg-card/90 hover:bg-card rounded-full p-2"
+                >
+                  <ChevronRight className="h-6 w-6" />
+                </button>
+              </>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
