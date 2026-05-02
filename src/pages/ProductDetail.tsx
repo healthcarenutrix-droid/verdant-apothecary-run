@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Star, Minus, Plus, ShoppingCart, ChevronRight, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -30,6 +30,24 @@ const ProductDetail = () => {
       product.options!.every(opt => v.optionValues[opt.name] === selectedOptions[opt.name])
     ) || null;
   }, [selectedOptions, product, hasVariants, hasOptions]);
+
+  // Pre-select first available variant's option values when product loads
+  useEffect(() => {
+    if (!product || !hasOptions) return;
+    const firstVariant = product.variants?.find(v => v.stock > 0) || product.variants?.[0];
+    const defaults: Record<string, string> = {};
+    if (firstVariant) {
+      product.options!.forEach(opt => {
+        defaults[opt.name] = firstVariant.optionValues[opt.name];
+      });
+    } else {
+      product.options!.forEach(opt => {
+        if (opt.values[0]) defaults[opt.name] = opt.values[0];
+      });
+    }
+    setSelectedOptions(defaults);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product?.id]);
 
   const activePrice = selectedVariant ? selectedVariant.price : (product?.price || 0);
   const activeCompare = selectedVariant?.compareAtPrice || product?.originalPrice;
