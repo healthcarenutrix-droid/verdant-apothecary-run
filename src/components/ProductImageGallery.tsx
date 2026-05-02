@@ -1,5 +1,5 @@
 import { useState, useRef, MouseEvent } from "react";
-import { ChevronLeft, ChevronRight, ZoomIn, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 interface ProductImageGalleryProps {
@@ -42,19 +42,11 @@ const ProductImageGallery = ({ images, name, onSale }: ProductImageGalleryProps)
             Sale!
           </span>
         )}
-        <button
-          type="button"
-          onClick={(e) => { e.stopPropagation(); setZoomOpen(true); }}
-          className="absolute top-3 right-3 z-10 bg-card/80 hover:bg-card rounded-full p-2 transition-colors"
-          aria-label="Open zoom"
-        >
-          <ZoomIn className="h-4 w-4" />
-        </button>
         <img
           src={allImages[selected]}
           alt={`${name} - Image ${selected + 1}`}
           className="w-full aspect-square object-cover transition-transform duration-200"
-          style={lens.show ? { transform: "scale(1.6)", transformOrigin: `${lens.x}% ${lens.y}%` } : undefined}
+          style={lens.show ? { transform: "scale(2.5)", transformOrigin: `${lens.x}% ${lens.y}%` } : undefined}
         />
         {allImages.length > 1 && (
           <>
