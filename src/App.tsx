@@ -28,6 +28,7 @@ import DashboardOrders from "./pages/dashboard/DashboardOrders";
 import DashboardReviews from "./pages/dashboard/DashboardReviews";
 import DashboardMessages from "./pages/dashboard/DashboardMessages";
 import DashboardBlogs from "./pages/dashboard/DashboardBlogs";
+import DashboardEmail from "./pages/dashboard/DashboardEmail";
 
 const queryClient = new QueryClient();
 
@@ -73,6 +74,7 @@ const App = () => (
                   <Route path="reviews" element={<DashboardReviews />} />
                   <Route path="messages" element={<DashboardMessages />} />
                   <Route path="blogs" element={<DashboardBlogs />} />
+                  <Route path="email" element={<DashboardEmail />} />
                 </Route>
                 <Route path="/*" element={<StorefrontLayout />} />
               </Routes>
