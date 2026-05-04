@@ -6,12 +6,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { addMessage, type ContactMessage } from "@/data/dashboard-data";
+import { queueNotification } from "@/lib/notifications";
 
 const Contact = () => {
   const { toast } = useToast();
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name || !form.email || !form.message) {
       toast({ title: "Missing fields", description: "Please fill in all required fields.", variant: "destructive" });
@@ -31,6 +32,12 @@ const Contact = () => {
       status: "unread",
     };
     addMessage(newMsg);
+    await queueNotification({
+      eventType: "message",
+      subject: `New contact message: ${newMsg.subject}`,
+      body: `From: ${newMsg.name} <${newMsg.email}>\nSubject: ${newMsg.subject}\n\n${newMsg.message}`,
+      payload: { ...newMsg },
+    });
     toast({ title: "Message sent!", description: "We'll get back to you soon." });
     setForm({ name: "", email: "", subject: "", message: "" });
   };

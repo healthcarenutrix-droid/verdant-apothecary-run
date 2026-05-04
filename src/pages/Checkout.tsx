@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/hooks/use-toast";
+import { queueNotification } from "@/lib/notifications";
 
 const Checkout = () => {
   const { items, totalPrice, clearCart } = useCart();
@@ -18,12 +19,24 @@ const Checkout = () => {
 
   const update = (key: string, value: string) => setForm((p) => ({ ...p, [key]: value }));
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.firstName || !form.lastName || !form.email || !form.phone || !form.address || !form.city) {
       toast({ title: "Missing fields", description: "Please fill in all required fields.", variant: "destructive" });
       return;
     }
+    const orderId = `ORD-${Date.now()}`;
+    const itemSummary = items.map((i) => `• ${i.name} × ${i.quantity}`).join("\n");
+    await queueNotification({
+      eventType: "order",
+      subject: `New order received: ${orderId} (Rs ${totalPrice.toFixed(2)})`,
+      body:
+        `Order ID: ${orderId}\n` +
+        `Customer: ${form.firstName} ${form.lastName} <${form.email}> | ${form.phone}\n` +
+        `Address: ${form.address}, ${form.city}, ${form.state} ${form.zip}, ${form.country}\n\n` +
+        `Items:\n${itemSummary}\n\nTotal: Rs ${totalPrice.toFixed(2)}\nPayment: Cash on Delivery`,
+      payload: { orderId, customer: form, items, total: totalPrice },
+    });
     clearCart();
     navigate("/order-complete");
   };
