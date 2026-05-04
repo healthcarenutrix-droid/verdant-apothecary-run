@@ -26,7 +26,17 @@ const Checkout = () => {
       return;
     }
     const orderId = `ORD-${Date.now()}`;
-    const itemSummary = items.map((i) => `• ${i.name} × ${i.quantity}`).join("\n");
+    const slimItems = items.map((i) => ({
+      id: i.id,
+      name: i.name,
+      variant: i.selectedVariant?.label ?? null,
+      quantity: i.quantity,
+      unitPrice: i.price,
+      lineTotal: i.price * i.quantity,
+    }));
+    const itemSummary = slimItems
+      .map((i) => `• ${i.name}${i.variant ? ` (${i.variant})` : ""} × ${i.quantity} — Rs ${i.lineTotal.toFixed(2)}`)
+      .join("\n");
     await queueNotification({
       eventType: "order",
       subject: `New order received: ${orderId} (Rs ${totalPrice.toFixed(2)})`,
@@ -35,7 +45,27 @@ const Checkout = () => {
         `Customer: ${form.firstName} ${form.lastName} <${form.email}> | ${form.phone}\n` +
         `Address: ${form.address}, ${form.city}, ${form.state} ${form.zip}, ${form.country}\n\n` +
         `Items:\n${itemSummary}\n\nTotal: Rs ${totalPrice.toFixed(2)}\nPayment: Cash on Delivery`,
-      payload: { orderId, customer: form, items, total: totalPrice },
+      payload: {
+        orderId,
+        placedAt: new Date().toISOString(),
+        customer: {
+          name: `${form.firstName} ${form.lastName}`.trim(),
+          email: form.email,
+          phone: form.phone,
+        },
+        shipping: {
+          address: form.address,
+          city: form.city,
+          state: form.state,
+          zip: form.zip,
+          country: form.country,
+        },
+        items: slimItems,
+        itemCount: slimItems.reduce((s, i) => s + i.quantity, 0),
+        total: totalPrice,
+        currency: "PKR",
+        paymentMethod: "Cash on Delivery",
+      },
     });
     clearCart();
     navigate("/order-complete");
