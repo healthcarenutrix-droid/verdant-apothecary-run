@@ -23,38 +23,73 @@ const Wishlist = () => {
       ) : (
         <div className="space-y-4">
           {items.map((product) => (
-            <div key={product.id} className="flex items-center gap-4 border border-border rounded-lg p-4">
-              <Link to={`/product/${product.id}`}>
-                <img src={product.image} alt={product.name} className="w-20 h-20 object-cover rounded" />
-              </Link>
-              <div className="flex-1 min-w-0">
-                <Link to={`/product/${product.id}`} className="text-sm font-medium text-foreground hover:text-primary transition-colors line-clamp-2">
-                  {product.name}
+            <div
+              key={product.id}
+              className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 border border-border rounded-lg p-3 sm:p-4"
+            >
+              <div className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">
+                <Link to={`/product/${product.id}`} className="shrink-0">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded"
+                  />
                 </Link>
-                <div className="flex items-center gap-2 mt-1">
-                  {product.originalPrice && (
-                    <span className="text-xs text-muted-foreground line-through">₨ {product.originalPrice.toLocaleString()}</span>
-                  )}
-
-                  {product.priceRange ? (
-                    <span className={`text-sm font-semibold ${product.originalPrice ? "text-green-600" : "text-foreground"}`}>{product.priceRange}</span>
-                  ) : (
-                    <span className={`text-sm font-semibold ${product.originalPrice ? "text-green-600" : "text-foreground"}`}>₨ {product.price.toLocaleString()}</span>
-                  )}
+                <div className="flex-1 min-w-0">
+                  <Link
+                    to={`/product/${product.id}`}
+                    className="text-sm font-medium text-foreground hover:text-primary transition-colors line-clamp-2 break-words"
+                  >
+                    {product.name}
+                  </Link>
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1">
+                    {product.originalPrice && (
+                      <span className="text-xs text-muted-foreground line-through">
+                        ₨ {product.originalPrice.toLocaleString()}
+                      </span>
+                    )}
+                    {product.priceRange ? (
+                      <span className={`text-sm font-semibold ${product.originalPrice ? "text-green-600" : "text-foreground"}`}>
+                        {product.priceRange}
+                      </span>
+                    ) : (
+                      <span className={`text-sm font-semibold ${product.originalPrice ? "text-green-600" : "text-foreground"}`}>
+                        ₨ {product.price.toLocaleString()}
+                      </span>
+                    )}
+                  </div>
                 </div>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="sm:hidden shrink-0"
+                  onClick={() => removeFromWishlist(product.id)}
+                  aria-label="Remove from wishlist"
+                >
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 sm:justify-end">
                 {!product.priceRange && (
-                  <Button size="sm" onClick={() => { addToCart(product); removeFromWishlist(product.id); }}>
+                  <Button
+                    size="sm"
+                    className="flex-1 sm:flex-none"
+                    onClick={() => { addToCart(product); removeFromWishlist(product.id); }}
+                  >
                     <ShoppingCart className="h-4 w-4 mr-1" /> Add to Cart
                   </Button>
                 )}
                 {product.priceRange && (
-                  <Button size="sm" variant="outline" asChild>
+                  <Button size="sm" variant="outline" className="flex-1 sm:flex-none" asChild>
                     <Link to={`/product/${product.id}`}>Select Options</Link>
                   </Button>
                 )}
-                <Button size="sm" variant="ghost" onClick={() => removeFromWishlist(product.id)}>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="hidden sm:inline-flex"
+                  onClick={() => removeFromWishlist(product.id)}
+                >
                   <Trash2 className="h-4 w-4 text-destructive" />
                 </Button>
               </div>
