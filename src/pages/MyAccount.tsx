@@ -37,7 +37,7 @@ const ADDRESS_KEY = "msur_address";
 
 const MyAccount = () => {
   const { toast } = useToast();
-  const { wishlist } = useWishlist();
+  const { items: wishlist } = useWishlist();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
   const [authForm, setAuthForm] = useState({ name: "", email: "", password: "" });
