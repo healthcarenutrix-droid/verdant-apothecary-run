@@ -1,7 +1,9 @@
+import { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ChevronRight, Calendar, Clock, ArrowLeft, User } from "lucide-react";
+import { ChevronRight, Calendar, Clock, ArrowLeft, User, Facebook, Twitter, Linkedin, Link2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getBlogPosts } from "@/data/dashboard-data";
+import { toast } from "@/hooks/use-toast";
 
 import blogTurmeric from "@/assets/blog-turmeric.jpg";
 import blogHerbalTea from "@/assets/blog-herbal-tea.jpg";
