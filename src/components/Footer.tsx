@@ -44,10 +44,11 @@ const Footer = () => (
         <div>
           <h4 className="font-semibold text-sm uppercase tracking-wider mb-4 text-white">Support</h4>
           <ul className="space-y-2 text-sm">
-            <li><Link to="/contact" className="text-white/70 hover:text-destructive transition-colors">My Account</Link></li>
-            <li><Link to="/contact" className="text-white/70 hover:text-destructive transition-colors">Order Tracking</Link></li>
-            <li><Link to="/contact" className="text-white/70 hover:text-destructive transition-colors">FAQs</Link></li>
-            <li><Link to="/contact" className="text-white/70 hover:text-destructive transition-colors">Return Policy</Link></li>
+            <li><Link to="/account" className="text-white/70 hover:text-destructive transition-colors">My Account</Link></li>
+            <li><Link to="/account" className="text-white/70 hover:text-destructive transition-colors">Order Tracking</Link></li>
+            <li><Link to="/faqs" className="text-white/70 hover:text-destructive transition-colors">FAQs</Link></li>
+            <li><Link to="/return-policy" className="text-white/70 hover:text-destructive transition-colors">Return Policy</Link></li>
+            <li><Link to="/shipping-policy" className="text-white/70 hover:text-destructive transition-colors">Shipping Policy</Link></li>
           </ul>
         </div>
 
