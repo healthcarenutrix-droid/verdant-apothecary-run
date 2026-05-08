@@ -258,6 +258,52 @@ const BlogPostPage = () => {
   const allPosts = getAllBlogPosts();
   const post = allPosts.find((p) => p.slug === slug);
 
+  // SEO: title + meta description
+  useEffect(() => {
+    if (!post) {
+      document.title = "Article not found | MSUR Herbs";
+      return;
+    }
+    const prevTitle = document.title;
+    document.title = `${post.title} | MSUR Herbs Blog`;
+
+    const setMeta = (name: string, content: string) => {
+      let tag = document.querySelector(`meta[name="${name}"]`) as HTMLMetaElement | null;
+      if (!tag) {
+        tag = document.createElement("meta");
+        tag.setAttribute("name", name);
+        document.head.appendChild(tag);
+      }
+      tag.setAttribute("content", content);
+    };
+    const setProp = (property: string, content: string) => {
+      let tag = document.querySelector(`meta[property="${property}"]`) as HTMLMetaElement | null;
+      if (!tag) {
+        tag = document.createElement("meta");
+        tag.setAttribute("property", property);
+        document.head.appendChild(tag);
+      }
+      tag.setAttribute("content", content);
+    };
+    setMeta("description", post.excerpt);
+    setProp("og:title", post.title);
+    setProp("og:description", post.excerpt);
+    setProp("og:image", post.image);
+    setProp("og:type", "article");
+
+    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    if (!canonical) {
+      canonical = document.createElement("link");
+      canonical.setAttribute("rel", "canonical");
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute("href", window.location.href);
+
+    return () => {
+      document.title = prevTitle;
+    };
+  }, [post]);
+
   if (!post) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-24 text-center">
@@ -268,33 +314,63 @@ const BlogPostPage = () => {
   }
 
   const recentPosts = allPosts.filter(p => p.slug !== slug).slice(0, 4);
+  const relatedPosts = allPosts
+    .filter(p => p.slug !== slug && p.category === post.category)
+    .slice(0, 3);
+
+  const shareUrl = typeof window !== "undefined" ? window.location.href : "";
+  const shareText = encodeURIComponent(post.title);
+  const encodedUrl = encodeURIComponent(shareUrl);
+
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast({ title: "Link copied", description: "Article URL copied to clipboard." });
+    } catch {
+      toast({ title: "Could not copy", description: "Please copy the URL manually.", variant: "destructive" });
+    }
+  };
 
   return (
     <div>
       {/* Breadcrumb */}
       <section className="bg-muted/50 border-b border-border py-4">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center gap-1 text-sm text-muted-foreground">
-            <Link to="/" className="hover:text-primary transition-colors">Home</Link>
-            <ChevronRight className="h-3 w-3" />
-            <Link to="/blog" className="hover:text-primary transition-colors">Blog</Link>
-            <ChevronRight className="h-3 w-3" />
-            <span className="text-foreground line-clamp-1">{post.title}</span>
+          <div className="flex items-center gap-1 text-sm text-muted-foreground overflow-hidden">
+            <Link to="/" className="hover:text-primary transition-colors shrink-0">Home</Link>
+            <ChevronRight className="h-3 w-3 shrink-0" />
+            <Link to="/blog" className="hover:text-primary transition-colors shrink-0">Blog</Link>
+            <ChevronRight className="h-3 w-3 shrink-0" />
+            <span className="text-foreground truncate">{post.title}</span>
           </div>
         </div>
       </section>
 
       {/* Main Layout: Content + Sidebar */}
-      <div className="max-w-7xl mx-auto px-4 py-10">
-        <div className="flex flex-col lg:flex-row gap-10">
+      <div className="max-w-7xl mx-auto px-4 py-8 md:py-10">
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-10">
           {/* Main Content */}
           <article className="flex-1 min-w-0">
+            {/* Category badge */}
+            <Link
+              to="/blog"
+              className="inline-block bg-primary/10 text-primary text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider mb-4 hover:bg-primary/20 transition-colors"
+            >
+              {post.category}
+            </Link>
+
             {/* Title */}
-            <h1 className="text-2xl md:text-4xl font-bold text-foreground leading-tight mb-6">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground leading-tight mb-4">
               {post.title}
             </h1>
 
-            {/* Separator */}
+            {/* Top meta */}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground mb-6">
+              <span className="flex items-center gap-1.5"><User className="h-3.5 w-3.5" /> {post.author}</span>
+              <span className="flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" /> {post.date}</span>
+              <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" /> {post.readTime}</span>
+            </div>
+
             <hr className="border-border mb-6" />
 
             {/* Intro paragraph (first paragraph) */}
@@ -304,16 +380,16 @@ const BlogPostPage = () => {
               const restParas = paragraphs.slice(1);
               return (
                 <>
-                  <p className="mb-8 text-muted-foreground leading-relaxed text-base text-justify">
+                  <p className="mb-6 md:mb-8 text-muted-foreground leading-relaxed text-base md:text-lg">
                     {firstPara}
                   </p>
 
-                  {/* Centered Featured Image */}
-                  <div className="flex justify-center mb-8">
+                  {/* Featured Image */}
+                  <div className="mb-8 rounded-lg overflow-hidden">
                     <img
                       src={post.image}
                       alt={post.title}
-                      className="rounded-lg max-w-full h-auto max-h-[500px] object-cover"
+                      className="w-full h-auto max-h-[500px] object-cover"
                     />
                   </div>
 
@@ -323,13 +399,13 @@ const BlogPostPage = () => {
                       const imgMatch = para.match(/^!\[.*?\]\((.*?)\)$/);
                       if (imgMatch) {
                         return (
-                          <div key={i} className="flex justify-center my-6">
-                            <img src={imgMatch[1]} alt="Blog content" className="rounded-lg max-w-full h-auto max-h-[400px] object-cover" />
+                          <div key={i} className="my-6 rounded-lg overflow-hidden">
+                            <img src={imgMatch[1]} alt="Blog content" loading="lazy" className="w-full h-auto max-h-[400px] object-cover" />
                           </div>
                         );
                       }
                       return (
-                        <p key={i} className="mb-5 text-muted-foreground leading-relaxed text-base text-justify">
+                        <p key={i} className="mb-5 text-muted-foreground leading-relaxed text-base">
                           {para}
                         </p>
                       );
@@ -339,14 +415,29 @@ const BlogPostPage = () => {
               );
             })()}
 
-            {/* Meta info */}
-            <div className="mt-8 pt-6 border-t border-border flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-              <span className="inline-block bg-primary/10 text-primary text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
-                {post.category}
-              </span>
-              <span className="flex items-center gap-1.5"><User className="h-3.5 w-3.5" /> {post.author}</span>
-              <span className="flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" /> {post.date}</span>
-              <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" /> {post.readTime}</span>
+            {/* Share buttons */}
+            <div className="mt-10 pt-6 border-t border-border">
+              <h3 className="text-sm font-semibold uppercase tracking-wider text-foreground mb-3">Share this article</h3>
+              <div className="flex flex-wrap gap-2">
+                <Button asChild size="sm" variant="outline">
+                  <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`} target="_blank" rel="noopener noreferrer" aria-label="Share on Facebook">
+                    <Facebook className="h-4 w-4 mr-2" /> Facebook
+                  </a>
+                </Button>
+                <Button asChild size="sm" variant="outline">
+                  <a href={`https://twitter.com/intent/tweet?url=${encodedUrl}&text=${shareText}`} target="_blank" rel="noopener noreferrer" aria-label="Share on Twitter">
+                    <Twitter className="h-4 w-4 mr-2" /> Twitter
+                  </a>
+                </Button>
+                <Button asChild size="sm" variant="outline">
+                  <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`} target="_blank" rel="noopener noreferrer" aria-label="Share on LinkedIn">
+                    <Linkedin className="h-4 w-4 mr-2" /> LinkedIn
+                  </a>
+                </Button>
+                <Button size="sm" variant="outline" onClick={copyLink} aria-label="Copy article link">
+                  <Link2 className="h-4 w-4 mr-2" /> Copy link
+                </Button>
+              </div>
             </div>
 
             <div className="mt-6">
@@ -354,6 +445,31 @@ const BlogPostPage = () => {
                 <Link to="/blog"><ArrowLeft className="h-4 w-4 mr-2" /> Back to Blog</Link>
               </Button>
             </div>
+
+            {/* Related posts */}
+            {relatedPosts.length > 0 && (
+              <section className="mt-12 pt-8 border-t border-border">
+                <h2 className="text-lg md:text-xl font-bold text-foreground mb-6">Related Articles</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+                  {relatedPosts.map(rp => (
+                    <Link to={`/blog/${rp.slug}`} key={rp.slug} className="group block">
+                      <div className="rounded-lg overflow-hidden mb-3 aspect-[4/3]">
+                        <img
+                          src={rp.image}
+                          alt={rp.title}
+                          loading="lazy"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      </div>
+                      <h3 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors line-clamp-2">
+                        {rp.title}
+                      </h3>
+                      <p className="text-xs text-muted-foreground mt-1">{rp.date} · {rp.readTime}</p>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
           </article>
 
           {/* Sidebar */}
@@ -361,19 +477,19 @@ const BlogPostPage = () => {
             <h2 className="text-sm font-bold uppercase tracking-wider text-foreground mb-6">
               Recent Blogs
             </h2>
-            <div className="space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6">
               {recentPosts.map(rp => (
                 <Link
                   to={`/blog/${rp.slug}`}
                   key={rp.slug}
                   className="group block"
                 >
-                  <div className="rounded-lg overflow-hidden mb-2">
+                  <div className="rounded-lg overflow-hidden mb-2 aspect-[16/10]">
                     <img
                       src={rp.image}
                       alt={rp.title}
                       loading="lazy"
-                      className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>
                   <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
