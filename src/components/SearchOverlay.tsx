@@ -77,7 +77,25 @@ const SearchOverlay = ({ open, onClose }: SearchOverlayProps) => {
             </Link>
           ))}
           {query.trim().length <= 1 && (
-            <p className="text-center text-muted-foreground py-8 text-sm">Type to search products...</p>
+            <div>
+              <p className="px-5 pt-4 pb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                Featured products
+              </p>
+              {featured.map((p) => (
+                <Link
+                  key={p.id}
+                  to={`/product/${p.id}`}
+                  onClick={onClose}
+                  className="flex items-center gap-4 px-5 py-3 hover:bg-secondary transition-colors"
+                >
+                  <img src={p.image} alt={p.name} className="w-12 h-12 rounded object-cover" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">{p.name}</p>
+                    <p className="text-xs text-muted-foreground">{p.category} — ₨ {p.price}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
           )}
         </div>
       </div>
