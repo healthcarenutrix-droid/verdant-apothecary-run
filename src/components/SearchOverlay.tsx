@@ -37,6 +37,8 @@ const SearchOverlay = ({ open, onClose }: SearchOverlayProps) => {
       )
     : [];
 
+  const featured = products.slice(0, 3);
+
   return (
     <div className="fixed inset-0 z-[100] bg-black/60 animate-fade-in" onClick={onClose}>
       <div
