@@ -19,6 +19,10 @@ import Contact from "./pages/Contact";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import Wishlist from "./pages/Wishlist";
+import MyAccount from "./pages/MyAccount";
+import FAQs from "./pages/FAQs";
+import ReturnPolicy from "./pages/ReturnPolicy";
+import ShippingPolicy from "./pages/ShippingPolicy";
 import NotFound from "./pages/NotFound";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import DashboardOverview from "./pages/dashboard/DashboardOverview";
@@ -49,6 +53,10 @@ const StorefrontLayout = () => (
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:slug" element={<BlogPost />} />
         <Route path="/wishlist" element={<Wishlist />} />
+        <Route path="/account" element={<MyAccount />} />
+        <Route path="/faqs" element={<FAQs />} />
+        <Route path="/return-policy" element={<ReturnPolicy />} />
+        <Route path="/shipping-policy" element={<ShippingPolicy />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </main>
