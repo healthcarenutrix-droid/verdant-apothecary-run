@@ -59,9 +59,9 @@ const Navbar = () => {
             <button className="hidden sm:block text-foreground hover:text-primary transition-colors" onClick={() => setSearchOpen(true)}>
               <Search className="h-5 w-5" />
             </button>
-            <button className="hidden sm:block text-foreground hover:text-primary transition-colors">
+            <Link to="/account" className="hidden sm:block text-foreground hover:text-primary transition-colors">
               <User className="h-5 w-5" />
-            </button>
+            </Link>
             <Link to="/wishlist" className="relative text-foreground hover:text-primary transition-colors">
               <Heart className="h-5 w-5" />
               {totalWishlist > 0 && (
