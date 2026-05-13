@@ -243,13 +243,19 @@ At MSUR Herbs, our black pepper is sourced from premium growing regions and care
 // Merge dashboard posts with static data for frontend display
 function getAllBlogPosts(): BlogPost[] {
   const dashPosts = getBlogPosts().filter(p => p.status === "published");
+  const staticBySlug = new Map(blogPostsData.map(p => [p.slug, p]));
   const dashSlugs = new Set(dashPosts.map(p => p.slug));
   const staticOnly = blogPostsData.filter(p => !dashSlugs.has(p.slug));
-  const mapped: BlogPost[] = dashPosts.map(dp => ({
-    slug: dp.slug, title: dp.title, category: dp.category, date: dp.date,
-    readTime: dp.readTime, author: dp.author, excerpt: dp.excerpt,
-    image: dp.image, featured: dp.featured, content: dp.content,
-  }));
+  const mapped: BlogPost[] = dashPosts.map(dp => {
+    const staticMatch = staticBySlug.get(dp.slug);
+    // Prefer freshly-bundled static image when slug matches (cached URLs go stale across builds)
+    const image = staticMatch ? staticMatch.image : dp.image;
+    return {
+      slug: dp.slug, title: dp.title, category: dp.category, date: dp.date,
+      readTime: dp.readTime, author: dp.author, excerpt: dp.excerpt,
+      image, featured: dp.featured, content: dp.content,
+    };
+  });
   return [...mapped, ...staticOnly];
 }
 
@@ -385,10 +391,11 @@ const BlogPostPage = () => {
                   </p>
 
                   {/* Featured Image */}
-                  <div className="mb-8 rounded-lg overflow-hidden">
+                  <div className="mb-8 rounded-lg overflow-hidden bg-muted">
                     <img
                       src={post.image}
                       alt={post.title}
+                      onError={(e) => { (e.currentTarget as HTMLImageElement).src = "/placeholder.svg"; }}
                       className="w-full h-auto max-h-[500px] object-cover"
                     />
                   </div>
