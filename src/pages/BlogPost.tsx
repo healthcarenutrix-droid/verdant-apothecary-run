@@ -391,10 +391,11 @@ const BlogPostPage = () => {
                   </p>
 
                   {/* Featured Image */}
-                  <div className="mb-8 rounded-lg overflow-hidden">
+                  <div className="mb-8 rounded-lg overflow-hidden bg-muted">
                     <img
                       src={post.image}
                       alt={post.title}
+                      onError={(e) => { (e.currentTarget as HTMLImageElement).src = "/placeholder.svg"; }}
                       className="w-full h-auto max-h-[500px] object-cover"
                     />
                   </div>
