@@ -67,6 +67,24 @@ const Checkout = () => {
         paymentMethod: "Cash on Delivery",
       },
     });
+
+    // Persist order locally so it appears in My Account → Orders
+    try {
+      const existing = JSON.parse(localStorage.getItem("msur_orders") || "[]");
+      const newOrder = {
+        id: orderId.replace(/^ORD-/, ""),
+        date: new Date().toISOString(),
+        total: totalPrice,
+        status: "Pending",
+        items: slimItems.map((i) => ({
+          name: i.variant ? `${i.name} (${i.variant})` : i.name,
+          qty: i.quantity,
+          price: i.unitPrice,
+        })),
+      };
+      localStorage.setItem("msur_orders", JSON.stringify([newOrder, ...existing]));
+    } catch {}
+
     clearCart();
     navigate("/order-complete");
   };
