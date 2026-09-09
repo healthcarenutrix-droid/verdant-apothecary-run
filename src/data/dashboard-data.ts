@@ -44,7 +44,14 @@ export interface ProductVariant {
   sku?: string;
 }
 
-export interface AdminProduct {
+export interface SeoFields {
+  handle?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  ogImage?: string;
+}
+
+export interface AdminProduct extends SeoFields {
   id: string;
   name: string;
   description: string;
@@ -53,6 +60,7 @@ export interface AdminProduct {
   stock: number;
   categoryId: string;
   image: string;
+  imageAlt?: string;
   images?: string[];
   status: "active" | "draft";
   createdAt: string;
@@ -62,7 +70,7 @@ export interface AdminProduct {
   variants?: ProductVariant[];
 }
 
-export interface AdminCategory {
+export interface AdminCategory extends SeoFields {
   id: string;
   name: string;
   slug: string;
@@ -272,19 +280,138 @@ function setStore<T>(key: string, data: T[]) {
   localStorage.setItem(key, JSON.stringify(data));
 }
 
+// ===== Database-backed content (products, categories, blog posts) =====
+// Bundled images get stable "asset:<key>" ids so stored rows survive rebuilds.
+const ASSETS: Record<string, string> = {
+  "prod-saffron": prodSaffron, "prod-anardana": prodAnardana, "prod-kali-mirch": prodKaliMirch,
+  "prod-black-pepper": prodBlackPepper, "prod-ginger": prodGinger, "prod-neem": prodNeem,
+  "prod-red-chilli": prodRedChilli, "prod-cardamom": prodCardamom, "prod-shikakai": prodShikakai,
+  "prod-ashwagandha": prodAshwagandha, "prod-white-pepper": prodWhitePepper, "prod-cumin": prodCumin,
+  "cat-arqiyat": catArqiyat, "cat-dryfruits": catDryfruits, "cat-preserves": catPreserves,
+  "cat-oils": catOils, "cat-herbs": catHerbs, "cat-spices": catSpices,
+  "blog-turmeric": blogTurmeric, "blog-herbal-tea": blogHerbalTea, "blog-ayurvedic": blogAyurvedic,
+  "blog-honey-ginger": blogHoneyGinger, "blog-dryfruits": blogDryfruits, "blog-traditional": blogTraditional,
+  "blog-skincare": blogSkincare, "blog-spice-market": blogSpiceMarket, "blog-black-pepper": blogBlackPepper,
+};
+const ASSET_KEYS: Record<string, string> = Object.fromEntries(Object.entries(ASSETS).map(([k, v]) => [v, k]));
+
+export const resolveImage = (value?: string): string => {
+  if (!value) return "";
+  if (value.startsWith("asset:")) return ASSETS[value.slice(6)] || "/placeholder.svg";
+  return value;
+};
+const packImage = (value?: string): string | null => {
+  if (!value) return null;
+  return ASSET_KEYS[value] ? `asset:${ASSET_KEYS[value]}` : value;
+};
+
+let productCache: AdminProduct[] = [];
+let categoryCache: AdminCategory[] = [];
+let blogCache: AdminBlogPost[] = [];
+
+const dateOnly = (v?: string) => (v ? String(v).slice(0, 10) : new Date().toISOString().slice(0, 10));
+
+const rowToProduct = (r: Row): AdminProduct => ({
+  id: r.id, name: r.name, description: r.description || "", price: Number(r.price) || 0,
+  compareAtPrice: r.compare_at_price != null ? Number(r.compare_at_price) : undefined,
+  stock: r.stock ?? 0, categoryId: r.category_id || "", image: resolveImage(r.image),
+  imageAlt: r.image_alt || undefined,
+  images: Array.isArray(r.images) ? r.images.map((i: string) => resolveImage(i)) : [],
+  status: (r.status as AdminProduct["status"]) || "active", createdAt: dateOnly(r.created_at),
+  priceRange: r.price_range || undefined, rating: r.rating != null ? Number(r.rating) : undefined,
+  options: r.options || [], variants: r.variants || [],
+  handle: r.handle, metaTitle: r.meta_title || undefined,
+  metaDescription: r.meta_description || undefined, ogImage: r.og_image || undefined,
+});
+
+const productToRow = (p: AdminProduct): Row => ({
+  id: p.id, name: p.name, handle: p.handle || slugify(p.name) || p.id, description: p.description || "",
+  price: p.price, compare_at_price: p.compareAtPrice ?? null, stock: p.stock ?? 0,
+  category_id: p.categoryId || null, image: packImage(p.image), image_alt: p.imageAlt || null,
+  images: (p.images || []).map(packImage).filter(Boolean), options: p.options || [], variants: p.variants || [],
+  price_range: p.priceRange || null, rating: p.rating ?? null, status: p.status,
+  meta_title: p.metaTitle || null, meta_description: p.metaDescription || null, og_image: packImage(p.ogImage),
+});
+
+const rowToCategory = (r: Row): AdminCategory => ({
+  id: r.id, name: r.name, slug: r.handle, description: r.description || "",
+  image: resolveImage(r.image) || undefined, parentId: r.parent_id || undefined,
+  status: (r.status as AdminCategory["status"]) || "active", createdAt: dateOnly(r.created_at),
+  handle: r.handle, metaTitle: r.meta_title || undefined, metaDescription: r.meta_description || undefined,
+});
+
+const categoryToRow = (c: AdminCategory): Row => ({
+  id: c.id, name: c.name, handle: c.handle || c.slug || slugify(c.name), description: c.description || "",
+  image: packImage(c.image), parent_id: c.parentId || null, status: c.status,
+  meta_title: c.metaTitle || null, meta_description: c.metaDescription || null,
+});
+
+const rowToBlog = (r: Row): AdminBlogPost => ({
+  id: r.id, slug: r.handle, title: r.title, category: r.category || "General",
+  date: r.display_date || dateOnly(r.created_at), readTime: r.read_time || "3 Min Read",
+  author: r.author || "MSUR Herbs", excerpt: r.excerpt || "", image: resolveImage(r.image),
+  imageAlt: r.image_alt || undefined, featured: !!r.featured, content: r.content || "",
+  status: (r.status as AdminBlogPost["status"]) || "published", createdAt: dateOnly(r.created_at),
+  handle: r.handle, metaTitle: r.meta_title || undefined,
+  metaDescription: r.meta_description || undefined, ogImage: r.og_image || undefined,
+});
+
+const blogToRow = (b: AdminBlogPost): Row => ({
+  id: b.id, title: b.title, handle: b.handle || b.slug || slugify(b.title), excerpt: b.excerpt || "",
+  content: b.content || "", category: b.category || "General", author: b.author || "MSUR Herbs",
+  read_time: b.readTime || null, display_date: b.date || null, image: packImage(b.image),
+  image_alt: b.imageAlt || null, featured: !!b.featured, status: b.status,
+  meta_title: b.metaTitle || null, meta_description: b.metaDescription || null, og_image: packImage(b.ogImage),
+});
+
+let contentReady: Promise<void> | null = null;
+
+/** Loads all catalogue content from the database, seeding it the first time. */
+export function initContentStore(): Promise<void> {
+  if (!contentReady) {
+    contentReady = (async () => {
+      const [cats, prods, blogs] = await Promise.all([
+        seedIfEmpty("categories", defaultCategories.map(categoryToRow)),
+        seedIfEmpty("products", defaultProducts.map(productToRow)),
+        seedIfEmpty("blog_posts", defaultBlogPosts.map(blogToRow)),
+      ]);
+      categoryCache = cats.map(rowToCategory);
+      productCache = prods.map(rowToProduct);
+      blogCache = blogs.map(rowToBlog);
+    })();
+  }
+  return contentReady;
+}
+
+export async function refreshContentStore(): Promise<void> {
+  const [cats, prods, blogs] = await Promise.all([
+    fetchTable("categories"), fetchTable("products"), fetchTable("blog_posts"),
+  ]);
+  categoryCache = cats.map(rowToCategory);
+  productCache = prods.map(rowToProduct);
+  blogCache = blogs.map(rowToBlog);
+}
+
 // Products CRUD
-export const getProducts = (): AdminProduct[] => getStore("admin_products", defaultProducts);
-export const saveProducts = (p: AdminProduct[]) => setStore("admin_products", p);
-export const addProduct = (p: AdminProduct) => { const all = getProducts(); all.push(p); saveProducts(all); };
-export const updateProduct = (p: AdminProduct) => { const all = getProducts().map(x => x.id === p.id ? p : x); saveProducts(all); };
-export const deleteProduct = (id: string) => { saveProducts(getProducts().filter(x => x.id !== id)); };
+export const getProducts = (): AdminProduct[] => productCache;
+export const saveProducts = (p: AdminProduct[]) => { productCache = p; void upsertRows("products", p.map(productToRow)); };
+export const addProduct = (p: AdminProduct) => { productCache = [...productCache, p]; void upsertRows("products", [productToRow(p)]); };
+export const updateProduct = (p: AdminProduct) => { productCache = productCache.map(x => x.id === p.id ? p : x); void upsertRows("products", [productToRow(p)]); };
+export const deleteProduct = (id: string) => { productCache = productCache.filter(x => x.id !== id); void deleteRow("products", id); };
 
 // Categories CRUD
-export const getCategories = (): AdminCategory[] => getStore("admin_categories", defaultCategories);
-export const saveCategories = (c: AdminCategory[]) => setStore("admin_categories", c);
-export const addCategory = (c: AdminCategory) => { const all = getCategories(); all.push(c); saveCategories(all); };
-export const updateCategory = (c: AdminCategory) => { const all = getCategories().map(x => x.id === c.id ? c : x); saveCategories(all); };
-export const deleteCategory = (id: string) => { saveCategories(getCategories().filter(x => x.id !== id)); };
+export const getCategories = (): AdminCategory[] => categoryCache;
+export const saveCategories = (c: AdminCategory[]) => { categoryCache = c; void upsertRows("categories", c.map(categoryToRow)); };
+export const addCategory = (c: AdminCategory) => { categoryCache = [...categoryCache, c]; void upsertRows("categories", [categoryToRow(c)]); };
+export const updateCategory = (c: AdminCategory) => { categoryCache = categoryCache.map(x => x.id === c.id ? c : x); void upsertRows("categories", [categoryToRow(c)]); };
+export const deleteCategory = (id: string) => { categoryCache = categoryCache.filter(x => x.id !== id); void deleteRow("categories", id); };
+
+// Blog posts CRUD
+export const getBlogPosts = (): AdminBlogPost[] => blogCache;
+export const saveBlogPosts = (b: AdminBlogPost[]) => { blogCache = b; void upsertRows("blog_posts", b.map(blogToRow)); };
+export const addBlogPost = (b: AdminBlogPost) => { blogCache = [...blogCache, b]; void upsertRows("blog_posts", [blogToRow(b)]); };
+export const updateBlogPost = (b: AdminBlogPost) => { blogCache = blogCache.map(x => x.id === b.id ? b : x); void upsertRows("blog_posts", [blogToRow(b)]); };
+export const deleteBlogPost = (id: string) => { blogCache = blogCache.filter(x => x.id !== id); void deleteRow("blog_posts", id); };
 
 // Orders CRUD
 export const getOrders = (): AdminOrder[] => getStore("admin_orders", defaultOrders);
@@ -328,7 +455,7 @@ export const updateMessage = (m: ContactMessage) => { const all = getMessages().
 export const deleteMessage = (id: string) => { saveMessages(getMessages().filter(x => x.id !== id)); };
 
 // Blog Posts
-export interface AdminBlogPost {
+export interface AdminBlogPost extends SeoFields {
   id: string;
   slug: string;
   title: string;
@@ -338,6 +465,7 @@ export interface AdminBlogPost {
   author: string;
   excerpt: string;
   image: string;
+  imageAlt?: string;
   featured?: boolean;
   content: string;
   status: "published" | "draft";

@@ -14,6 +14,114 @@ export type Database = {
   }
   public: {
     Tables: {
+      blog_posts: {
+        Row: {
+          author: string
+          category: string
+          content: string
+          created_at: string
+          display_date: string | null
+          excerpt: string
+          featured: boolean
+          handle: string
+          id: string
+          image: string | null
+          image_alt: string | null
+          meta_description: string | null
+          meta_title: string | null
+          og_image: string | null
+          read_time: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author?: string
+          category?: string
+          content?: string
+          created_at?: string
+          display_date?: string | null
+          excerpt?: string
+          featured?: boolean
+          handle: string
+          id: string
+          image?: string | null
+          image_alt?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
+          og_image?: string | null
+          read_time?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author?: string
+          category?: string
+          content?: string
+          created_at?: string
+          display_date?: string | null
+          excerpt?: string
+          featured?: boolean
+          handle?: string
+          id?: string
+          image?: string | null
+          image_alt?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
+          og_image?: string | null
+          read_time?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      categories: {
+        Row: {
+          created_at: string
+          description: string
+          handle: string
+          id: string
+          image: string | null
+          meta_description: string | null
+          meta_title: string | null
+          name: string
+          parent_id: string | null
+          sort_order: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          handle: string
+          id: string
+          image?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
+          name: string
+          parent_id?: string | null
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          handle?: string
+          id?: string
+          image?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
+          name?: string
+          parent_id?: string | null
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       notification_events: {
         Row: {
           body: string
@@ -68,6 +176,78 @@ export type Database = {
           id?: boolean
           recipient_email?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          category_id: string | null
+          compare_at_price: number | null
+          created_at: string
+          description: string
+          handle: string
+          id: string
+          image: string | null
+          image_alt: string | null
+          images: Json
+          meta_description: string | null
+          meta_title: string | null
+          name: string
+          og_image: string | null
+          options: Json
+          price: number
+          price_range: string | null
+          rating: number | null
+          status: string
+          stock: number
+          updated_at: string
+          variants: Json
+        }
+        Insert: {
+          category_id?: string | null
+          compare_at_price?: number | null
+          created_at?: string
+          description?: string
+          handle: string
+          id: string
+          image?: string | null
+          image_alt?: string | null
+          images?: Json
+          meta_description?: string | null
+          meta_title?: string | null
+          name: string
+          og_image?: string | null
+          options?: Json
+          price?: number
+          price_range?: string | null
+          rating?: number | null
+          status?: string
+          stock?: number
+          updated_at?: string
+          variants?: Json
+        }
+        Update: {
+          category_id?: string | null
+          compare_at_price?: number | null
+          created_at?: string
+          description?: string
+          handle?: string
+          id?: string
+          image?: string | null
+          image_alt?: string | null
+          images?: Json
+          meta_description?: string | null
+          meta_title?: string | null
+          name?: string
+          og_image?: string | null
+          options?: Json
+          price?: number
+          price_range?: string | null
+          rating?: number | null
+          status?: string
+          stock?: number
+          updated_at?: string
+          variants?: Json
         }
         Relationships: []
       }
