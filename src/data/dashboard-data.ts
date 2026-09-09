@@ -44,7 +44,14 @@ export interface ProductVariant {
   sku?: string;
 }
 
-export interface AdminProduct {
+export interface SeoFields {
+  handle?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  ogImage?: string;
+}
+
+export interface AdminProduct extends SeoFields {
   id: string;
   name: string;
   description: string;
@@ -53,6 +60,7 @@ export interface AdminProduct {
   stock: number;
   categoryId: string;
   image: string;
+  imageAlt?: string;
   images?: string[];
   status: "active" | "draft";
   createdAt: string;
@@ -62,7 +70,7 @@ export interface AdminProduct {
   variants?: ProductVariant[];
 }
 
-export interface AdminCategory {
+export interface AdminCategory extends SeoFields {
   id: string;
   name: string;
   slug: string;
