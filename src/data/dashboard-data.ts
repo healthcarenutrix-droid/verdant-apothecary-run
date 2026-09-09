@@ -336,7 +336,7 @@ export const updateMessage = (m: ContactMessage) => { const all = getMessages().
 export const deleteMessage = (id: string) => { saveMessages(getMessages().filter(x => x.id !== id)); };
 
 // Blog Posts
-export interface AdminBlogPost {
+export interface AdminBlogPost extends SeoFields {
   id: string;
   slug: string;
   title: string;
@@ -346,6 +346,7 @@ export interface AdminBlogPost {
   author: string;
   excerpt: string;
   image: string;
+  imageAlt?: string;
   featured?: boolean;
   content: string;
   status: "published" | "draft";
