@@ -176,7 +176,7 @@ const BlogFormDialog = ({ open, onOpenChange, post, onSave }: BlogFormDialogProp
               <Input value={title} onChange={e => handleTitleChange(e.target.value)} placeholder="Enter blog title" />
             </div>
             <div className="space-y-2">
-              <Label>Slug</Label>
+              <Label>URL handle (slug)</Label>
               <Input value={slug} onChange={e => setSlug(e.target.value)} placeholder="auto-generated-from-title" />
             </div>
           </div>
@@ -256,6 +256,12 @@ const BlogFormDialog = ({ open, onOpenChange, post, onSave }: BlogFormDialogProp
             )}
           </div>
 
+          {/* Featured image alt text */}
+          <div className="space-y-2">
+            <Label>Featured image alt text</Label>
+            <Input value={imageAlt} onChange={e => setImageAlt(e.target.value)} placeholder="Describe the image for screen readers and search engines" />
+          </div>
+
           {/* Excerpt */}
           <div className="space-y-2">
             <Label>Excerpt *</Label>
@@ -271,7 +277,7 @@ const BlogFormDialog = ({ open, onOpenChange, post, onSave }: BlogFormDialogProp
                 <ToolbarBtn icon={Italic} label="Italic" onClick={() => insertFormatting("*", "*")} />
                 <ToolbarBtn icon={Underline} label="Underline" onClick={() => insertFormatting("<u>", "</u>")} />
                 <Separator orientation="vertical" className="h-6 mx-1" />
-                <ToolbarBtn icon={Heading1} label="Heading 1" onClick={() => insertBlock("# ")} />
+                
                 <ToolbarBtn icon={Heading2} label="Heading 2" onClick={() => insertBlock("## ")} />
                 <ToolbarBtn icon={Heading3} label="Heading 3" onClick={() => insertBlock("### ")} />
                 <Separator orientation="vertical" className="h-6 mx-1" />
