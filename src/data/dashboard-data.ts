@@ -1,3 +1,4 @@
+import { Row, fetchTable, upsertRows, deleteRow, seedIfEmpty, slugify } from "@/data/content-db";
 import prodSaffron from "@/assets/prod-saffron.webp";
 import prodAnardana from "@/assets/prod-anardana.webp";
 import prodKaliMirch from "@/assets/prod-kali-mirch.jpg";
