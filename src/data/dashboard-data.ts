@@ -547,14 +547,5 @@ const defaultBlogPosts: AdminBlogPost[] = [
   },
 ];
 
-export const getBlogPosts = (): AdminBlogPost[] => getStore("admin_blog_posts", defaultBlogPosts);
-export const saveBlogPosts = (b: AdminBlogPost[]) => setStore("admin_blog_posts", b);
-export const addBlogPost = (b: AdminBlogPost) => { const all = getBlogPosts(); all.push(b); saveBlogPosts(all); };
-export const updateBlogPost = (b: AdminBlogPost) => { const all = getBlogPosts().map(x => x.id === b.id ? b : x); saveBlogPosts(all); };
-export const deleteBlogPost = (id: string) => { saveBlogPosts(getBlogPosts().filter(x => x.id !== id)); };
-
-// Reset to defaults
-export const resetProducts = () => { localStorage.removeItem("admin_products"); };
-export const resetCategories = () => { localStorage.removeItem("admin_categories"); };
+// Reset local-only stores to defaults
 export const resetReviews = () => { localStorage.removeItem("admin_reviews"); };
-export const resetBlogPosts = () => { localStorage.removeItem("admin_blog_posts"); };
