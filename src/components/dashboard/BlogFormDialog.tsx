@@ -344,6 +344,33 @@ const BlogFormDialog = ({ open, onOpenChange, post, onSave }: BlogFormDialogProp
             <Switch checked={featured} onCheckedChange={setFeatured} />
             <Label>Featured post</Label>
           </div>
+
+          {/* Search engine & social sharing */}
+          <div className="rounded-lg border border-border p-4 space-y-4">
+            <div>
+              <Label className="text-sm font-semibold">Search engine & social sharing</Label>
+              <p className="text-xs text-muted-foreground mt-1">
+                Leave blank to use the post title and excerpt automatically.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label>Meta title</Label>
+              <Input value={metaTitle} onChange={e => setMetaTitle(e.target.value)} placeholder={title || "Page title shown in Google"} maxLength={70} />
+              <p className="text-xs text-muted-foreground">{(metaTitle || title).length}/60 characters recommended</p>
+            </div>
+            <div className="space-y-2">
+              <Label>Meta description</Label>
+              <Textarea rows={2} value={metaDescription} onChange={e => setMetaDescription(e.target.value)} placeholder={excerpt || "Short summary shown under the title in Google"} maxLength={200} />
+              <p className="text-xs text-muted-foreground">{(metaDescription || excerpt).length}/160 characters recommended</p>
+            </div>
+            <div className="space-y-2">
+              <Label>Social share image URL</Label>
+              <Input value={ogImage} onChange={e => setOgImage(e.target.value)} placeholder="Leave blank to use the featured image" />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Page address: /blog/{slug || generateSlug(title) || "your-post"}
+            </p>
+          </div>
         </div>
 
         <DialogFooter>
