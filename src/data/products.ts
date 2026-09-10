@@ -6,12 +6,14 @@ export interface StorefrontCategory {
   slug: string;
   image?: string;
   description: string;
+  metaTitle?: string;
+  metaDescription?: string;
 }
 
 function buildProducts(): Product[] {
   const adminProducts = getProducts().filter(p => p.status === "active");
   const cats = getCategories();
-  
+
   return adminProducts.map(p => {
     const cat = cats.find(c => c.id === p.categoryId);
     return {
@@ -42,15 +44,28 @@ function buildCategoryObjects(): StorefrontCategory[] {
     .filter(c => c.status === "active")
     .map(c => ({
       name: c.name,
-      slug: c.slug,
+      slug: c.handle || c.slug,
       image: c.image,
       description: c.description,
+      metaTitle: c.metaTitle,
+      metaDescription: c.metaDescription,
     }));
 }
 
-export const products: Product[] = buildProducts();
-export const categories: string[] = buildCategories();
-export const categoryObjects: StorefrontCategory[] = buildCategoryObjects();
+// Live arrays: mutated in place whenever the database content is (re)loaded,
+// so existing imports keep working without a page reload.
+export const products: Product[] = [];
+export const categories: string[] = [];
+export const categoryObjects: StorefrontCategory[] = [];
+
+export function refreshStorefrontData() {
+  products.length = 0;
+  products.push(...buildProducts());
+  categories.length = 0;
+  categories.push(...buildCategories());
+  categoryObjects.length = 0;
+  categoryObjects.push(...buildCategoryObjects());
+}
 
 export const getStorefrontProducts = buildProducts;
 export const getStorefrontCategories = buildCategories;

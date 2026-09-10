@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { AdminBlogPost } from "@/data/dashboard-data";
 import {
-  Bold, Italic, Underline, Heading1, Heading2, Heading3,
+  Bold, Italic, Underline, Heading2, Heading3,
   List, ListOrdered, Quote, Link as LinkIcon, Minus,
   Upload, X, Image as ImageIcon
 } from "lucide-react";
@@ -42,6 +42,10 @@ const BlogFormDialog = ({ open, onOpenChange, post, onSave }: BlogFormDialogProp
   const [excerpt, setExcerpt] = useState("");
   const [content, setContent] = useState("");
   const [image, setImage] = useState("");
+  const [imageAlt, setImageAlt] = useState("");
+  const [metaTitle, setMetaTitle] = useState("");
+  const [metaDescription, setMetaDescription] = useState("");
+  const [ogImage, setOgImage] = useState("");
   const [readTime, setReadTime] = useState("5 Min Read");
   const [featured, setFeatured] = useState(false);
   const [status, setStatus] = useState<"published" | "draft">("published");
@@ -56,14 +60,17 @@ const BlogFormDialog = ({ open, onOpenChange, post, onSave }: BlogFormDialogProp
 
   useEffect(() => {
     if (post) {
-      setTitle(post.title); setSlug(post.slug); setCategory(post.category);
+      setTitle(post.title); setSlug(post.handle || post.slug); setCategory(post.category);
       setAuthor(post.author); setExcerpt(post.excerpt); setContent(post.content);
       setImage(post.image); setReadTime(post.readTime); setFeatured(post.featured || false);
       setStatus(post.status); setImageMode(post.image?.startsWith("http") ? "url" : "upload");
+      setImageAlt(post.imageAlt || ""); setMetaTitle(post.metaTitle || "");
+      setMetaDescription(post.metaDescription || ""); setOgImage(post.ogImage || "");
     } else {
       setTitle(""); setSlug(""); setCategory("Wellness"); setAuthor("MSUR Herbs");
       setExcerpt(""); setContent(""); setImage(""); setReadTime("5 Min Read");
       setFeatured(false); setStatus("published"); setImageMode("upload");
+      setImageAlt(""); setMetaTitle(""); setMetaDescription(""); setOgImage("");
     }
   }, [post, open]);
 
@@ -134,13 +141,19 @@ const BlogFormDialog = ({ open, onOpenChange, post, onSave }: BlogFormDialogProp
     if (!title.trim() || !content.trim()) return;
     const now = new Date();
     const dateStr = now.toLocaleDateString("en-US", { month: "long", day: "2-digit", year: "numeric" });
+    const handle = generateSlug(slug || title);
     onSave({
       id: post?.id || `blog-${Date.now()}`,
-      slug: slug || generateSlug(title),
+      slug: handle,
+      handle,
       title: title.trim(), category,
       date: post?.date || dateStr, readTime, author,
       excerpt: excerpt.trim(),
       image: image || "/placeholder.svg",
+      imageAlt: imageAlt.trim() || title.trim(),
+      metaTitle: metaTitle.trim() || undefined,
+      metaDescription: metaDescription.trim() || undefined,
+      ogImage: ogImage.trim() || undefined,
       featured, content: content.trim(), status,
       createdAt: post?.createdAt || now.toISOString().split("T")[0],
     });
@@ -163,7 +176,7 @@ const BlogFormDialog = ({ open, onOpenChange, post, onSave }: BlogFormDialogProp
               <Input value={title} onChange={e => handleTitleChange(e.target.value)} placeholder="Enter blog title" />
             </div>
             <div className="space-y-2">
-              <Label>Slug</Label>
+              <Label>URL handle (slug)</Label>
               <Input value={slug} onChange={e => setSlug(e.target.value)} placeholder="auto-generated-from-title" />
             </div>
           </div>
@@ -243,6 +256,12 @@ const BlogFormDialog = ({ open, onOpenChange, post, onSave }: BlogFormDialogProp
             )}
           </div>
 
+          {/* Featured image alt text */}
+          <div className="space-y-2">
+            <Label>Featured image alt text</Label>
+            <Input value={imageAlt} onChange={e => setImageAlt(e.target.value)} placeholder="Describe the image for screen readers and search engines" />
+          </div>
+
           {/* Excerpt */}
           <div className="space-y-2">
             <Label>Excerpt *</Label>
@@ -258,7 +277,7 @@ const BlogFormDialog = ({ open, onOpenChange, post, onSave }: BlogFormDialogProp
                 <ToolbarBtn icon={Italic} label="Italic" onClick={() => insertFormatting("*", "*")} />
                 <ToolbarBtn icon={Underline} label="Underline" onClick={() => insertFormatting("<u>", "</u>")} />
                 <Separator orientation="vertical" className="h-6 mx-1" />
-                <ToolbarBtn icon={Heading1} label="Heading 1" onClick={() => insertBlock("# ")} />
+                
                 <ToolbarBtn icon={Heading2} label="Heading 2" onClick={() => insertBlock("## ")} />
                 <ToolbarBtn icon={Heading3} label="Heading 3" onClick={() => insertBlock("### ")} />
                 <Separator orientation="vertical" className="h-6 mx-1" />
@@ -324,6 +343,33 @@ const BlogFormDialog = ({ open, onOpenChange, post, onSave }: BlogFormDialogProp
           <div className="flex items-center gap-3">
             <Switch checked={featured} onCheckedChange={setFeatured} />
             <Label>Featured post</Label>
+          </div>
+
+          {/* Search engine & social sharing */}
+          <div className="rounded-lg border border-border p-4 space-y-4">
+            <div>
+              <Label className="text-sm font-semibold">Search engine & social sharing</Label>
+              <p className="text-xs text-muted-foreground mt-1">
+                Leave blank to use the post title and excerpt automatically.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label>Meta title</Label>
+              <Input value={metaTitle} onChange={e => setMetaTitle(e.target.value)} placeholder={title || "Page title shown in Google"} maxLength={70} />
+              <p className="text-xs text-muted-foreground">{(metaTitle || title).length}/60 characters recommended</p>
+            </div>
+            <div className="space-y-2">
+              <Label>Meta description</Label>
+              <Textarea rows={2} value={metaDescription} onChange={e => setMetaDescription(e.target.value)} placeholder={excerpt || "Short summary shown under the title in Google"} maxLength={200} />
+              <p className="text-xs text-muted-foreground">{(metaDescription || excerpt).length}/160 characters recommended</p>
+            </div>
+            <div className="space-y-2">
+              <Label>Social share image URL</Label>
+              <Input value={ogImage} onChange={e => setOgImage(e.target.value)} placeholder="Leave blank to use the featured image" />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Page address: /blog/{slug || generateSlug(title) || "your-post"}
+            </p>
           </div>
         </div>
 
