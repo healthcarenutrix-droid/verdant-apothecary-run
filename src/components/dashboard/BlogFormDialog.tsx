@@ -141,13 +141,19 @@ const BlogFormDialog = ({ open, onOpenChange, post, onSave }: BlogFormDialogProp
     if (!title.trim() || !content.trim()) return;
     const now = new Date();
     const dateStr = now.toLocaleDateString("en-US", { month: "long", day: "2-digit", year: "numeric" });
+    const handle = generateSlug(slug || title);
     onSave({
       id: post?.id || `blog-${Date.now()}`,
-      slug: slug || generateSlug(title),
+      slug: handle,
+      handle,
       title: title.trim(), category,
       date: post?.date || dateStr, readTime, author,
       excerpt: excerpt.trim(),
       image: image || "/placeholder.svg",
+      imageAlt: imageAlt.trim() || title.trim(),
+      metaTitle: metaTitle.trim() || undefined,
+      metaDescription: metaDescription.trim() || undefined,
+      ogImage: ogImage.trim() || undefined,
       featured, content: content.trim(), status,
       createdAt: post?.createdAt || now.toISOString().split("T")[0],
     });
