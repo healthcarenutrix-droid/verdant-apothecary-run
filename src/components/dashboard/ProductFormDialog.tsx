@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { AdminProduct, getCategories, ProductOption, ProductVariant } from "@/data/dashboard-data";
+import { slugify } from "@/data/content-db";
 import MultiImageUpload from "./MultiImageUpload";
 import { Plus, Trash2, X, Wand2 } from "lucide-react";
 
@@ -24,6 +25,11 @@ const schema = z.object({
   images: z.array(z.string()).min(1, "At least one image is required"),
   priceRange: z.string().max(50).optional(),
   status: z.boolean(),
+  handle: z.string().trim().max(80).optional(),
+  imageAlt: z.string().max(200).optional(),
+  metaTitle: z.string().max(70).optional(),
+  metaDescription: z.string().max(200).optional(),
+  ogImage: z.string().max(500).optional(),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -64,6 +70,7 @@ const ProductFormDialog = ({ open, onOpenChange, product, onSave }: Props) => {
     defaultValues: {
       name: "", description: "", price: 0, compareAtPrice: "",
       stock: 0, categoryId: "", images: [], priceRange: "", status: true,
+      handle: "", imageAlt: "", metaTitle: "", metaDescription: "", ogImage: "",
     },
   });
 
@@ -87,6 +94,11 @@ const ProductFormDialog = ({ open, onOpenChange, product, onSave }: Props) => {
         images: product.images || (product.image ? [product.image] : []),
         priceRange: product.priceRange || "",
         status: product.status === "active",
+        handle: product.handle || "",
+        imageAlt: product.imageAlt || "",
+        metaTitle: product.metaTitle || "",
+        metaDescription: product.metaDescription || "",
+        ogImage: product.ogImage || "",
       });
       setOptions(product.options || []);
       setVariants(product.variants || []);
@@ -94,6 +106,7 @@ const ProductFormDialog = ({ open, onOpenChange, product, onSave }: Props) => {
       form.reset({
         name: "", description: "", price: 0, compareAtPrice: "",
         stock: 0, categoryId: "", images: [], priceRange: "", status: true,
+        handle: "", imageAlt: "", metaTitle: "", metaDescription: "", ogImage: "",
       });
       setOptions([]);
       setVariants([]);
@@ -186,6 +199,11 @@ const ProductFormDialog = ({ open, onOpenChange, product, onSave }: Props) => {
       status: values.status ? "active" : "draft",
       createdAt: product?.createdAt || new Date().toISOString().split("T")[0],
       priceRange: values.priceRange || undefined,
+      handle: slugify(values.handle || values.name),
+      imageAlt: values.imageAlt || undefined,
+      metaTitle: values.metaTitle || undefined,
+      metaDescription: values.metaDescription || undefined,
+      ogImage: values.ogImage || undefined,
       options: options.filter(o => o.values.length > 0),
       variants: variants.length > 0 ? variants : undefined,
     };
@@ -395,6 +413,48 @@ const ProductFormDialog = ({ open, onOpenChange, product, onSave }: Props) => {
                   ))}
                 </div>
               )}
+            </div>
+
+            <div className="rounded-lg border border-border p-4 space-y-4">
+              <div>
+                <FormLabel className="text-sm font-semibold">Search engine & social sharing</FormLabel>
+                <p className="text-xs text-muted-foreground mt-1">Leave blank to use the product name and description automatically.</p>
+              </div>
+              <FormField control={form.control} name="handle" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>URL handle</FormLabel>
+                  <FormControl><Input placeholder="auto-generated-from-name" {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="metaTitle" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Meta title</FormLabel>
+                  <FormControl><Input placeholder="Title shown in Google" {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="metaDescription" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Meta description</FormLabel>
+                  <FormControl><Textarea rows={2} placeholder="Summary shown under the title in Google" {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="imageAlt" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Main image alt text</FormLabel>
+                  <FormControl><Input placeholder="Describe the product photo" {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="ogImage" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Social share image URL</FormLabel>
+                  <FormControl><Input placeholder="Leave blank to use the main product image" {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
             </div>
 
             <FormField control={form.control} name="status" render={({ field }) => (
