@@ -42,6 +42,10 @@ const BlogFormDialog = ({ open, onOpenChange, post, onSave }: BlogFormDialogProp
   const [excerpt, setExcerpt] = useState("");
   const [content, setContent] = useState("");
   const [image, setImage] = useState("");
+  const [imageAlt, setImageAlt] = useState("");
+  const [metaTitle, setMetaTitle] = useState("");
+  const [metaDescription, setMetaDescription] = useState("");
+  const [ogImage, setOgImage] = useState("");
   const [readTime, setReadTime] = useState("5 Min Read");
   const [featured, setFeatured] = useState(false);
   const [status, setStatus] = useState<"published" | "draft">("published");
@@ -56,14 +60,17 @@ const BlogFormDialog = ({ open, onOpenChange, post, onSave }: BlogFormDialogProp
 
   useEffect(() => {
     if (post) {
-      setTitle(post.title); setSlug(post.slug); setCategory(post.category);
+      setTitle(post.title); setSlug(post.handle || post.slug); setCategory(post.category);
       setAuthor(post.author); setExcerpt(post.excerpt); setContent(post.content);
       setImage(post.image); setReadTime(post.readTime); setFeatured(post.featured || false);
       setStatus(post.status); setImageMode(post.image?.startsWith("http") ? "url" : "upload");
+      setImageAlt(post.imageAlt || ""); setMetaTitle(post.metaTitle || "");
+      setMetaDescription(post.metaDescription || ""); setOgImage(post.ogImage || "");
     } else {
       setTitle(""); setSlug(""); setCategory("Wellness"); setAuthor("MSUR Herbs");
       setExcerpt(""); setContent(""); setImage(""); setReadTime("5 Min Read");
       setFeatured(false); setStatus("published"); setImageMode("upload");
+      setImageAlt(""); setMetaTitle(""); setMetaDescription(""); setOgImage("");
     }
   }, [post, open]);
 
