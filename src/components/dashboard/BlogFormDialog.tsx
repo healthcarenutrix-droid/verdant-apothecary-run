@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { AdminBlogPost } from "@/data/dashboard-data";
 import {
-  Bold, Italic, Underline, Heading1, Heading2, Heading3,
+  Bold, Italic, Underline, Heading2, Heading3,
   List, ListOrdered, Quote, Link as LinkIcon, Minus,
   Upload, X, Image as ImageIcon
 } from "lucide-react";
