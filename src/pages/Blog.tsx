@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { getBlogPosts } from "@/data/dashboard-data";
 import { blogPostsData, BlogPost } from "@/pages/BlogPost";
 import {
+import Seo from "@/components/Seo";
   Pagination,
   PaginationContent,
   PaginationItem,
@@ -76,6 +77,8 @@ const Blog = () => {
 
   return (
     <div>
+
+    <Seo title="Blog | MSUR Herbs" description="Guides and stories about herbs, spices and natural wellness from MSUR Herbs." path="/blog" />
       {/* Hero Featured Slider */}
       {currentHero && (
         <section className="relative bg-muted/30">
