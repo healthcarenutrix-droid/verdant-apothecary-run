@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { AdminCategory, getCategories } from "@/data/dashboard-data";
 import ImageUpload from "./ImageUpload";
+import { slugify } from "@/data/content-db";
 
 const schema = z.object({
   name: z.string().trim().min(1, "Category name is required").max(100),
@@ -19,6 +20,8 @@ const schema = z.object({
   image: z.string().optional(),
   parentId: z.string().optional(),
   status: z.boolean(),
+  metaTitle: z.string().max(70).optional(),
+  metaDescription: z.string().max(200).optional(),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -37,7 +40,7 @@ const CategoryFormDialog = ({ open, onOpenChange, category, onSave }: Props) => 
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { name: "", slug: "", description: "", image: "", parentId: "", status: true },
+    defaultValues: { name: "", slug: "", description: "", image: "", parentId: "", status: true, metaTitle: "", metaDescription: "" },
   });
 
   const nameValue = form.watch("name");
@@ -54,9 +57,11 @@ const CategoryFormDialog = ({ open, onOpenChange, category, onSave }: Props) => 
         image: category.image || "",
         parentId: category.parentId || "",
         status: category.status === "active",
+        metaTitle: category.metaTitle || "",
+        metaDescription: category.metaDescription || "",
       });
     } else {
-      form.reset({ name: "", slug: "", description: "", image: "", parentId: "", status: true });
+      form.reset({ name: "", slug: "", description: "", image: "", parentId: "", status: true, metaTitle: "", metaDescription: "" });
     }
   }, [category, open, form]);
 
@@ -64,11 +69,14 @@ const CategoryFormDialog = ({ open, onOpenChange, category, onSave }: Props) => 
     const data: AdminCategory = {
       id: category?.id || `cat-${Date.now()}`,
       name: values.name,
-      slug: values.slug,
+      slug: slugify(values.slug || values.name),
       description: values.description || "",
       image: values.image || undefined,
       parentId: values.parentId || undefined,
       status: values.status ? "active" : "inactive",
+      handle: slugify(values.slug || values.name),
+      metaTitle: values.metaTitle || undefined,
+      metaDescription: values.metaDescription || undefined,
       createdAt: category?.createdAt || new Date().toISOString().split("T")[0],
     };
     onSave(data);
@@ -93,7 +101,7 @@ const CategoryFormDialog = ({ open, onOpenChange, category, onSave }: Props) => 
 
             <FormField control={form.control} name="slug" render={({ field }) => (
               <FormItem>
-                <FormLabel>Slug</FormLabel>
+                <FormLabel>URL handle (slug)</FormLabel>
                 <FormControl><Input {...field} /></FormControl>
                 <FormMessage />
               </FormItem>
@@ -133,6 +141,27 @@ const CategoryFormDialog = ({ open, onOpenChange, category, onSave }: Props) => 
                 </Select>
               </FormItem>
             )} />
+
+            <div className="rounded-lg border border-border p-4 space-y-4">
+              <div>
+                <FormLabel className="text-sm font-semibold">Search engine listing</FormLabel>
+                <p className="text-xs text-muted-foreground mt-1">Leave blank to use the collection name and description.</p>
+              </div>
+              <FormField control={form.control} name="metaTitle" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Meta title</FormLabel>
+                  <FormControl><Input placeholder="Title shown in Google" {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="metaDescription" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Meta description</FormLabel>
+                  <FormControl><Textarea rows={2} placeholder="Summary shown under the title in Google" {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+            </div>
 
             <FormField control={form.control} name="status" render={({ field }) => (
               <FormItem className="flex items-center justify-between rounded-lg border border-border p-3">
