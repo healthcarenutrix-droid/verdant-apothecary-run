@@ -33,7 +33,6 @@ interface Props {
   onSave: (category: AdminCategory) => void;
 }
 
-const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
 const CategoryFormDialog = ({ open, onOpenChange, category, onSave }: Props) => {
   const allCategories = getCategories().filter(c => !category || c.id !== category.id);
