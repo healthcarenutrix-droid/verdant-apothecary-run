@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ChevronRight, Calendar, Clock, ArrowLeft, User, Facebook, Twitter, Linkedin, Link2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -415,7 +414,7 @@ const BlogPostPage = () => {
                   <div className="mb-8 rounded-lg overflow-hidden bg-muted">
                     <img
                       src={post.image}
-                      alt={post.title}
+                      alt={post.imageAlt || post.title}
                       onError={(e) => { (e.currentTarget as HTMLImageElement).src = "/placeholder.svg"; }}
                       className="w-full h-auto max-h-[500px] object-cover"
                     />
