@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import ProductCard from "@/components/ProductCard";
 import { products, categoryObjects } from "@/data/products";
+import Seo from "@/components/Seo";
 
 import heroBg from "@/assets/hero-bg.jpg";
 import catSpices from "@/assets/cat-spices.webp";
@@ -348,6 +349,11 @@ const SubscriptionBanner = () => {
 /* ─── Index Page ─── */
 const Index = () => (
   <div>
+    <Seo
+      title="MSUR Herbs — Pure Herbs, Spices & Dry Fruits"
+      description="Shop pure herbs, hand-picked spices, saffron and premium dry fruits from MSUR Herbs, delivered fresh across Pakistan."
+      path="/"
+    />
     <Hero />
     <ShippingBanner />
     <Categories />

@@ -1,9 +1,9 @@
-import { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ChevronRight, Calendar, Clock, ArrowLeft, User, Facebook, Twitter, Linkedin, Link2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getBlogPosts } from "@/data/dashboard-data";
 import { toast } from "@/hooks/use-toast";
+import Seo from "@/components/Seo";
 
 import blogTurmeric from "@/assets/blog-turmeric.jpg";
 import blogHerbalTea from "@/assets/blog-herbal-tea.jpg";
@@ -26,6 +26,10 @@ export interface BlogPost {
   image: string;
   featured?: boolean;
   content: string;
+  imageAlt?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  ogImage?: string;
 }
 
 const blogPostsData: BlogPost[] = [
@@ -254,6 +258,8 @@ function getAllBlogPosts(): BlogPost[] {
       slug: dp.slug, title: dp.title, category: dp.category, date: dp.date,
       readTime: dp.readTime, author: dp.author, excerpt: dp.excerpt,
       image, featured: dp.featured, content: dp.content,
+      imageAlt: dp.imageAlt, metaTitle: dp.metaTitle,
+      metaDescription: dp.metaDescription, ogImage: dp.ogImage,
     };
   });
   return [...mapped, ...staticOnly];
@@ -264,51 +270,6 @@ const BlogPostPage = () => {
   const allPosts = getAllBlogPosts();
   const post = allPosts.find((p) => p.slug === slug);
 
-  // SEO: title + meta description
-  useEffect(() => {
-    if (!post) {
-      document.title = "Article not found | MSUR Herbs";
-      return;
-    }
-    const prevTitle = document.title;
-    document.title = `${post.title} | MSUR Herbs Blog`;
-
-    const setMeta = (name: string, content: string) => {
-      let tag = document.querySelector(`meta[name="${name}"]`) as HTMLMetaElement | null;
-      if (!tag) {
-        tag = document.createElement("meta");
-        tag.setAttribute("name", name);
-        document.head.appendChild(tag);
-      }
-      tag.setAttribute("content", content);
-    };
-    const setProp = (property: string, content: string) => {
-      let tag = document.querySelector(`meta[property="${property}"]`) as HTMLMetaElement | null;
-      if (!tag) {
-        tag = document.createElement("meta");
-        tag.setAttribute("property", property);
-        document.head.appendChild(tag);
-      }
-      tag.setAttribute("content", content);
-    };
-    setMeta("description", post.excerpt);
-    setProp("og:title", post.title);
-    setProp("og:description", post.excerpt);
-    setProp("og:image", post.image);
-    setProp("og:type", "article");
-
-    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
-    if (!canonical) {
-      canonical = document.createElement("link");
-      canonical.setAttribute("rel", "canonical");
-      document.head.appendChild(canonical);
-    }
-    canonical.setAttribute("href", window.location.href);
-
-    return () => {
-      document.title = prevTitle;
-    };
-  }, [post]);
 
   if (!post) {
     return (
@@ -339,6 +300,22 @@ const BlogPostPage = () => {
 
   return (
     <div>
+      <Seo
+        title={post.metaTitle || `${post.title} | MSUR Herbs Blog`}
+        description={post.metaDescription || post.excerpt}
+        path={`/blog/${post.slug}`}
+        image={post.ogImage || post.image}
+        type="article"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "Article",
+          headline: post.title,
+          image: post.ogImage || post.image,
+          author: { "@type": "Person", name: post.author },
+          datePublished: post.date,
+          description: post.metaDescription || post.excerpt,
+        }}
+      />
       {/* Breadcrumb */}
       <section className="bg-muted/50 border-b border-border py-4">
         <div className="max-w-7xl mx-auto px-4">
@@ -394,7 +371,7 @@ const BlogPostPage = () => {
                   <div className="mb-8 rounded-lg overflow-hidden bg-muted">
                     <img
                       src={post.image}
-                      alt={post.title}
+                      alt={post.imageAlt || post.title}
                       onError={(e) => { (e.currentTarget as HTMLImageElement).src = "/placeholder.svg"; }}
                       className="w-full h-auto max-h-[500px] object-cover"
                     />

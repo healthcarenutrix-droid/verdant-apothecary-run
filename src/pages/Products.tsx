@@ -9,6 +9,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetFooter
 import { Badge } from "@/components/ui/badge";
 import ProductCard from "@/components/ProductCard";
 import { products, categories } from "@/data/products";
+import Seo from "@/components/Seo";
 
 const Products = () => {
   const [search, setSearch] = useState("");
@@ -62,6 +63,8 @@ const Products = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 lg:px-8 py-8 lg:py-12">
+
+    <Seo title="Shop All Products | MSUR Herbs" description="Browse every herb, spice, saffron blend and dry fruit available at MSUR Herbs." path="/products" />
       <h1 className="section-title mb-6 lg:mb-8">Shop</h1>
 
       <div className="flex items-center gap-2 mb-6">

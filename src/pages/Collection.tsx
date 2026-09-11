@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetFooter } from "@/components/ui/sheet";
+import Seo from "@/components/Seo";
 
 const Collection = () => {
   const { slug } = useParams();
@@ -111,6 +112,12 @@ const Collection = () => {
 
   return (
     <div>
+      <Seo
+        title={category?.metaTitle || `${categoryName || "Collection"} | MSUR Herbs`}
+        description={category?.metaDescription || category?.description}
+        path={`/collections/${slug}`}
+        image={category?.image}
+      />
       {/* Banner */}
       <section className="relative bg-primary text-primary-foreground py-12 text-center overflow-hidden">
         {category?.image && (

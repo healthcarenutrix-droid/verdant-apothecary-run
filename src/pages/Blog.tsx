@@ -4,6 +4,7 @@ import { Calendar, Clock, ChevronLeft, ChevronRight, ArrowRight } from "lucide-r
 import { Button } from "@/components/ui/button";
 import { getBlogPosts } from "@/data/dashboard-data";
 import { blogPostsData, BlogPost } from "@/pages/BlogPost";
+import Seo from "@/components/Seo";
 import {
   Pagination,
   PaginationContent,
@@ -76,6 +77,8 @@ const Blog = () => {
 
   return (
     <div>
+
+    <Seo title="Blog | MSUR Herbs" description="Guides and stories about herbs, spices and natural wellness from MSUR Herbs." path="/blog" />
       {/* Hero Featured Slider */}
       {currentHero && (
         <section className="relative bg-muted/30">

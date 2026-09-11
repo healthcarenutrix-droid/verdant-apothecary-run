@@ -9,7 +9,8 @@ import { products } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
 import ProductImageGallery from "@/components/ProductImageGallery";
 import ProductReviews from "@/components/ProductReviews";
-import { ProductVariant } from "@/data/dashboard-data";
+import { ProductVariant, getProducts } from "@/data/dashboard-data";
+import Seo from "@/components/Seo";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -85,8 +86,30 @@ const ProductDetail = () => {
     for (let i = 0; i < qty; i++) addToCart(product, selectedVariant || undefined);
   };
 
+  const adminProduct = getProducts().find(p => p.id === String(product.id));
+
   return (
     <div>
+      <Seo
+        title={adminProduct?.metaTitle || `${product.name} | MSUR Herbs`}
+        description={adminProduct?.metaDescription || product.description?.slice(0, 155)}
+        path={`/product/${product.id}`}
+        image={adminProduct?.ogImage || product.image}
+        type="product"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name: product.name,
+          image: adminProduct?.ogImage || product.image,
+          description: adminProduct?.metaDescription || product.description,
+          offers: {
+            "@type": "Offer",
+            price: product.price,
+            priceCurrency: "PKR",
+            availability: "https://schema.org/InStock",
+          },
+        }}
+      />
       {/* Breadcrumb */}
       <div className="max-w-7xl mx-auto px-4 lg:px-8 py-4">
         <div className="flex items-center gap-1 text-sm text-muted-foreground">
