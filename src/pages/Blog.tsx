@@ -4,8 +4,8 @@ import { Calendar, Clock, ChevronLeft, ChevronRight, ArrowRight } from "lucide-r
 import { Button } from "@/components/ui/button";
 import { getBlogPosts } from "@/data/dashboard-data";
 import { blogPostsData, BlogPost } from "@/pages/BlogPost";
-import {
 import Seo from "@/components/Seo";
+import {
   Pagination,
   PaginationContent,
   PaginationItem,
