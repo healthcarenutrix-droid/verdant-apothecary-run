@@ -1,5 +1,5 @@
 import { Product } from "@/contexts/CartContext";
-import { getProducts, getCategories, AdminCategory } from "@/data/dashboard-data";
+import { getProducts, getCategories, AdminCategory, onContentChange } from "@/data/dashboard-data";
 
 export interface StorefrontCategory {
   name: string;
@@ -70,3 +70,6 @@ export function refreshStorefrontData() {
 export const getStorefrontProducts = buildProducts;
 export const getStorefrontCategories = buildCategories;
 export const getStorefrontCategoryObjects = buildCategoryObjects;
+
+
+onContentChange(() => { refreshStorefrontData(); });

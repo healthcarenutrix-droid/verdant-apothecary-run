@@ -396,23 +396,27 @@ export async function refreshContentStore(): Promise<void> {
 // Products CRUD
 export const getProducts = (): AdminProduct[] => productCache;
 export const saveProducts = (p: AdminProduct[]) => { productCache = p; void upsertRows("products", p.map(productToRow)); };
-export const addProduct = (p: AdminProduct) => { productCache = [...productCache, p]; void upsertRows("products", [productToRow(p)]); };
-export const updateProduct = (p: AdminProduct) => { productCache = productCache.map(x => x.id === p.id ? p : x); void upsertRows("products", [productToRow(p)]); };
-export const deleteProduct = (id: string) => { productCache = productCache.filter(x => x.id !== id); void deleteRow("products", id); };
+const contentListeners = new Set<() => void>();
+export const onContentChange = (fn: () => void) => { contentListeners.add(fn); return () => contentListeners.delete(fn); };
+const notifyContentChange = () => { contentListeners.forEach(fn => fn()); };
+
+export const addProduct = (p: AdminProduct) => { productCache = [...productCache, p]; void upsertRows("products", [productToRow(p)]);  notifyContentChange(); };
+export const updateProduct = (p: AdminProduct) => { productCache = productCache.map(x => x.id === p.id ? p : x); void upsertRows("products", [productToRow(p)]);  notifyContentChange(); };
+export const deleteProduct = (id: string) => { productCache = productCache.filter(x => x.id !== id); void deleteRow("products", id);  notifyContentChange(); };
 
 // Categories CRUD
 export const getCategories = (): AdminCategory[] => categoryCache;
 export const saveCategories = (c: AdminCategory[]) => { categoryCache = c; void upsertRows("categories", c.map(categoryToRow)); };
-export const addCategory = (c: AdminCategory) => { categoryCache = [...categoryCache, c]; void upsertRows("categories", [categoryToRow(c)]); };
-export const updateCategory = (c: AdminCategory) => { categoryCache = categoryCache.map(x => x.id === c.id ? c : x); void upsertRows("categories", [categoryToRow(c)]); };
-export const deleteCategory = (id: string) => { categoryCache = categoryCache.filter(x => x.id !== id); void deleteRow("categories", id); };
+export const addCategory = (c: AdminCategory) => { categoryCache = [...categoryCache, c]; void upsertRows("categories", [categoryToRow(c)]);  notifyContentChange(); };
+export const updateCategory = (c: AdminCategory) => { categoryCache = categoryCache.map(x => x.id === c.id ? c : x); void upsertRows("categories", [categoryToRow(c)]);  notifyContentChange(); };
+export const deleteCategory = (id: string) => { categoryCache = categoryCache.filter(x => x.id !== id); void deleteRow("categories", id);  notifyContentChange(); };
 
 // Blog posts CRUD
 export const getBlogPosts = (): AdminBlogPost[] => blogCache;
 export const saveBlogPosts = (b: AdminBlogPost[]) => { blogCache = b; void upsertRows("blog_posts", b.map(blogToRow)); };
-export const addBlogPost = (b: AdminBlogPost) => { blogCache = [...blogCache, b]; void upsertRows("blog_posts", [blogToRow(b)]); };
-export const updateBlogPost = (b: AdminBlogPost) => { blogCache = blogCache.map(x => x.id === b.id ? b : x); void upsertRows("blog_posts", [blogToRow(b)]); };
-export const deleteBlogPost = (id: string) => { blogCache = blogCache.filter(x => x.id !== id); void deleteRow("blog_posts", id); };
+export const addBlogPost = (b: AdminBlogPost) => { blogCache = [...blogCache, b]; void upsertRows("blog_posts", [blogToRow(b)]);  notifyContentChange(); };
+export const updateBlogPost = (b: AdminBlogPost) => { blogCache = blogCache.map(x => x.id === b.id ? b : x); void upsertRows("blog_posts", [blogToRow(b)]);  notifyContentChange(); };
+export const deleteBlogPost = (id: string) => { blogCache = blogCache.filter(x => x.id !== id); void deleteRow("blog_posts", id);  notifyContentChange(); };
 
 // Orders CRUD
 export const getOrders = (): AdminOrder[] => getStore("admin_orders", defaultOrders);
