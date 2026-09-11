@@ -270,49 +270,6 @@ const BlogPostPage = () => {
   const allPosts = getAllBlogPosts();
   const post = allPosts.find((p) => p.slug === slug);
 
-  if (!post) {
-      document.title = "Article not found | MSUR Herbs";
-      return;
-    }
-    const prevTitle = document.title;
-    document.title = `${post.title} | MSUR Herbs Blog`;
-
-    const setMeta = (name: string, content: string) => {
-      let tag = document.querySelector(`meta[name="${name}"]`) as HTMLMetaElement | null;
-      if (!tag) {
-        tag = document.createElement("meta");
-        tag.setAttribute("name", name);
-        document.head.appendChild(tag);
-      }
-      tag.setAttribute("content", content);
-    };
-    const setProp = (property: string, content: string) => {
-      let tag = document.querySelector(`meta[property="${property}"]`) as HTMLMetaElement | null;
-      if (!tag) {
-        tag = document.createElement("meta");
-        tag.setAttribute("property", property);
-        document.head.appendChild(tag);
-      }
-      tag.setAttribute("content", content);
-    };
-    setMeta("description", post.excerpt);
-    setProp("og:title", post.title);
-    setProp("og:description", post.excerpt);
-    setProp("og:image", post.image);
-    setProp("og:type", "article");
-
-    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
-    if (!canonical) {
-      canonical = document.createElement("link");
-      canonical.setAttribute("rel", "canonical");
-      document.head.appendChild(canonical);
-    }
-    canonical.setAttribute("href", window.location.href);
-
-    return () => {
-      document.title = prevTitle;
-    };
-  }, [post]);
 
   if (!post) {
     return (
