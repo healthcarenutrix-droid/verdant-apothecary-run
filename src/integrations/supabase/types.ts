@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      announcement_settings: {
+        Row: {
+          announcement_text: string
+          background_color: string
+          enabled: boolean
+          id: boolean
+          text_color: string
+          updated_at: string
+        }
+        Insert: {
+          announcement_text?: string
+          background_color?: string
+          enabled?: boolean
+          id?: boolean
+          text_color?: string
+          updated_at?: string
+        }
+        Update: {
+          announcement_text?: string
+          background_color?: string
+          enabled?: boolean
+          id?: boolean
+          text_color?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           author: string
