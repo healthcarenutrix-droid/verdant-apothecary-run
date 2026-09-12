@@ -42,6 +42,9 @@
     --subscription-bg: 0 50% 25%;
     --subscription-foreground: 0 0% 95%;
 
+    --announcement-bg: #2f6b2f;
+    --announcement-fg: #ffffff;
+
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 93 60% 42%;
@@ -95,6 +98,40 @@
 }
 
 @layer components {
+  .announcement-bar {
+    height: 2.5rem;
+    width: 100%;
+    overflow: hidden;
+    background-color: var(--announcement-bg);
+    color: var(--announcement-fg);
+  }
+
+  .announcement-track {
+    display: flex;
+    width: max-content;
+    height: 100%;
+    animation: announcement-scroll-left 15s linear infinite;
+    will-change: transform;
+  }
+
+  .announcement-copy {
+    display: flex;
+    min-width: 100vw;
+    height: 100%;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: space-around;
+    gap: 3rem;
+    padding-inline: 1.5rem;
+    white-space: nowrap;
+    font-size: 0.8125rem;
+    font-weight: 600;
+  }
+
+  .announcement-bar:hover .announcement-track {
+    animation-play-state: paused;
+  }
+
   .nav-link {
     @apply text-sm font-medium text-foreground hover:text-primary transition-colors relative;
   }
@@ -128,5 +165,26 @@
 @layer utilities {
   .section-padding {
     @apply px-4 py-12 md:px-8 lg:px-16 lg:py-16;
+  }
+}
+
+@keyframes announcement-scroll-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .announcement-track {
+    width: 100%;
+    animation: none;
+  }
+
+  .announcement-copy {
+    min-width: 100%;
+  }
+
+  .announcement-copy + .announcement-copy,
+  .announcement-copy span:not(:first-child) {
+    display: none;
   }
 }
