@@ -24,7 +24,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="sticky top-0 z-50 bg-card border-b border-border">
+      <nav className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto flex items-center justify-between h-16 px-4 lg:px-8">
           {/* Left: Nav Links (desktop) */}
           <div className="hidden lg:flex items-center gap-6">
