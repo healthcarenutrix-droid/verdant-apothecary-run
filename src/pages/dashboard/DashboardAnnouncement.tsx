@@ -40,8 +40,13 @@ const DashboardAnnouncement = () => {
 
   const handleSave = async () => {
     const announcementText = settings.announcement_text.trim();
+    const isHexColor = (value: string) => /^#[0-9A-Fa-f]{6}$/.test(value);
     if (!announcementText) {
       toast({ title: "Announcement text is required", variant: "destructive" });
+      return;
+    }
+    if (!isHexColor(settings.background_color) || !isHexColor(settings.text_color)) {
+      toast({ title: "Enter valid 6-digit hex colors", description: "Example: #2F6B2F", variant: "destructive" });
       return;
     }
 

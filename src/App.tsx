@@ -33,12 +33,17 @@ import DashboardReviews from "./pages/dashboard/DashboardReviews";
 import DashboardMessages from "./pages/dashboard/DashboardMessages";
 import DashboardBlogs from "./pages/dashboard/DashboardBlogs";
 import DashboardEmail from "./pages/dashboard/DashboardEmail";
+import DashboardAnnouncement from "./pages/dashboard/DashboardAnnouncement";
+import AnnouncementBar from "@/components/AnnouncementBar";
 
 const queryClient = new QueryClient();
 
 const StorefrontLayout = () => (
   <>
-    <Navbar />
+    <header className="sticky top-0 z-50">
+      <AnnouncementBar />
+      <Navbar />
+    </header>
     <main className="flex-1">
       <Routes>
         <Route path="/" element={<Index />} />
@@ -83,6 +88,7 @@ const App = () => (
                   <Route path="messages" element={<DashboardMessages />} />
                   <Route path="blogs" element={<DashboardBlogs />} />
                   <Route path="email" element={<DashboardEmail />} />
+                  <Route path="announcement" element={<DashboardAnnouncement />} />
                 </Route>
                 <Route path="/*" element={<StorefrontLayout />} />
               </Routes>

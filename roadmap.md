@@ -19,4 +19,4 @@
 - [x] robots.txt allows /product/, /collections/, /blog/
 - [ ] sitemap.xml — deferred until the site has a public/published domain
 
-- [ ] Database-backed announcement bar with dashboard controls and live storefront updates
+- [x] Database-backed announcement bar with dashboard controls and live storefront updates

@@ -21,7 +21,7 @@ interface AnnouncementBarProps {
 }
 
 const AnnouncementBar = ({ settings: suppliedSettings, preview = false }: AnnouncementBarProps) => {
-  const [remoteSettings, setRemoteSettings] = useState<AnnouncementSettings>(DEFAULT_ANNOUNCEMENT_SETTINGS);
+  const [remoteSettings, setRemoteSettings] = useState<AnnouncementSettings | null>(null);
 
   useEffect(() => {
     if (suppliedSettings) return;
@@ -60,6 +60,7 @@ const AnnouncementBar = ({ settings: suppliedSettings, preview = false }: Announ
   }, [suppliedSettings]);
 
   const settings = suppliedSettings ?? remoteSettings;
+  if (!settings) return null;
   if (!settings.enabled || !settings.announcement_text.trim()) return null;
 
   const colors = {
