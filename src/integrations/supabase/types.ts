@@ -278,6 +278,33 @@ export type Database = {
         }
         Relationships: []
       }
+      site_settings: {
+        Row: {
+          ga4_id: string
+          google_ads_id: string
+          id: number
+          meta_pixel_id: string
+          tiktok_pixel_id: string
+          updated_at: string
+        }
+        Insert: {
+          ga4_id?: string
+          google_ads_id?: string
+          id?: number
+          meta_pixel_id?: string
+          tiktok_pixel_id?: string
+          updated_at?: string
+        }
+        Update: {
+          ga4_id?: string
+          google_ads_id?: string
+          id?: number
+          meta_pixel_id?: string
+          tiktok_pixel_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
