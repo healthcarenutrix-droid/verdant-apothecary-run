@@ -1,4 +1,4 @@
-import { LayoutDashboard, Package, FolderTree, ShoppingBag, Star, ArrowLeft, MessageSquare, FileText, Mail } from "lucide-react";
+import { LayoutDashboard, Package, FolderTree, ShoppingBag, Star, ArrowLeft, MessageSquare, FileText, Mail, Megaphone } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -23,6 +23,7 @@ const items = [
   { title: "Messages", url: "/dashboard/messages", icon: MessageSquare },
   { title: "Blog Posts", url: "/dashboard/blogs", icon: FileText },
   { title: "Email Notifications", url: "/dashboard/email", icon: Mail },
+  { title: "Announcement Bar", url: "/dashboard/announcement", icon: Megaphone },
 ];
 
 export function DashboardSidebar() {
