@@ -83,6 +83,7 @@ const App = () => (
           <BrowserRouter>
             <ScrollToTop />
             <PixelLoader />
+            <TrackingScripts />
             <CookieConsent />
             <div className="min-h-screen flex flex-col">
               <Routes>
