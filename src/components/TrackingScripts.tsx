@@ -86,8 +86,9 @@ function injectMeta() {
   })(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js");
   /* eslint-enable */
 
-  window.fbq?.("init", META_PIXEL_ID);
-  window.fbq?.("track", "PageView");
+  const fbq = window.fbq as ((...args: unknown[]) => void) | undefined;
+  fbq?.("init", META_PIXEL_ID);
+  fbq?.("track", "PageView");
 
   // <noscript> fallback pixel (must live in <body>, never <head>)
   const noscript = document.createElement("noscript");
