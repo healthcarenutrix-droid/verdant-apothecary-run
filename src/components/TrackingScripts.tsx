@@ -6,28 +6,6 @@ const GOOGLE_ADS_ID = "AW-10833445743";
 const TIKTOK_PIXEL_ID = "D9QNEOJC77U05N07MKL0";
 const META_PIXEL_ID = "YOUR_FB_PIXEL_ID";
 
-declare global {
-  interface Window {
-    dataLayer?: unknown[];
-    gtag?: (...args: unknown[]) => void;
-    fbq?: ((...args: unknown[]) => void) & {
-      callMethod?: (...args: unknown[]) => void;
-      queue?: unknown[];
-      push?: unknown;
-      loaded?: boolean;
-      version?: string;
-    };
-    _fbq?: unknown;
-    ttq?: {
-      track?: (event: string, params?: Record<string, unknown>) => void;
-      page?: () => void;
-      load?: (id: string) => void;
-      [key: string]: unknown;
-    };
-    TiktokAnalyticsObject?: string;
-  }
-}
-
 function injectGoogleAds() {
   if (typeof window.gtag === "function") return; // already injected
   const script = document.createElement("script");
