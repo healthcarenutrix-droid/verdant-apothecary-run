@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/hooks/use-toast";
 import { queueNotification } from "@/lib/notifications";
+import { trackBeginCheckout, trackPurchase } from "@/lib/pixels";
 
 const Checkout = () => {
   const { items, totalPrice, clearCart } = useCart();
@@ -18,6 +19,16 @@ const Checkout = () => {
   });
 
   const update = (key: string, value: string) => setForm((p) => ({ ...p, [key]: value }));
+
+  const beganCheckout = useRef(false);
+  useEffect(() => {
+    if (beganCheckout.current || items.length === 0) return;
+    beganCheckout.current = true;
+    trackBeginCheckout(
+      items.map((i) => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity })),
+      totalPrice,
+    );
+  }, [items, totalPrice]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,6 +95,13 @@ const Checkout = () => {
       };
       localStorage.setItem("msur_orders", JSON.stringify([newOrder, ...existing]));
     } catch {}
+
+    trackPurchase(
+      orderId,
+      totalPrice,
+      slimItems.map((i) => ({ id: i.id, name: i.name, price: i.unitPrice, quantity: i.quantity })),
+      "PKR",
+    );
 
     clearCart();
     navigate("/order-complete");
