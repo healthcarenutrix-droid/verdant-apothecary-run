@@ -35,6 +35,10 @@ import DashboardBlogs from "./pages/dashboard/DashboardBlogs";
 import DashboardEmail from "./pages/dashboard/DashboardEmail";
 import DashboardAnnouncement from "./pages/dashboard/DashboardAnnouncement";
 import AnnouncementBar from "@/components/AnnouncementBar";
+import DashboardPixels from "./pages/dashboard/DashboardPixels";
+import PixelLoader from "@/components/PixelLoader";
+import CookieConsent from "@/components/CookieConsent";
+import { Navigate } from "react-router-dom";
 
 const queryClient = new QueryClient();
 
@@ -77,6 +81,8 @@ const App = () => (
           <Toaster />
           <BrowserRouter>
             <ScrollToTop />
+            <PixelLoader />
+            <CookieConsent />
             <div className="min-h-screen flex flex-col">
               <Routes>
                 <Route path="/dashboard" element={<DashboardLayout />}>
@@ -89,7 +95,9 @@ const App = () => (
                   <Route path="blogs" element={<DashboardBlogs />} />
                   <Route path="email" element={<DashboardEmail />} />
                   <Route path="announcement" element={<DashboardAnnouncement />} />
+                  <Route path="pixel-settings" element={<DashboardPixels />} />
                 </Route>
+                <Route path="/admin/pixel-settings" element={<Navigate to="/dashboard/pixel-settings" replace />} />
                 <Route path="/*" element={<StorefrontLayout />} />
               </Routes>
             </div>
