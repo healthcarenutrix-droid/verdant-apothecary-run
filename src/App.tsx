@@ -37,6 +37,7 @@ import DashboardAnnouncement from "./pages/dashboard/DashboardAnnouncement";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import DashboardPixels from "./pages/dashboard/DashboardPixels";
 import PixelLoader from "@/components/PixelLoader";
+import TrackingScripts from "@/components/TrackingScripts";
 import CookieConsent from "@/components/CookieConsent";
 import { Navigate } from "react-router-dom";
 
@@ -82,6 +83,7 @@ const App = () => (
           <BrowserRouter>
             <ScrollToTop />
             <PixelLoader />
+            <TrackingScripts />
             <CookieConsent />
             <div className="min-h-screen flex flex-col">
               <Routes>
