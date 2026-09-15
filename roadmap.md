@@ -20,3 +20,5 @@
 - [ ] sitemap.xml — deferred until the site has a public/published domain
 
 - [x] Database-backed announcement bar with dashboard controls and live storefront updates
+
+- [x] Pixel settings page + PixelLoader + cookie consent banner (site_settings table)

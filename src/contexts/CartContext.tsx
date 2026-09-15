@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ProductVariant, ProductOption } from "@/data/dashboard-data";
+import { trackAddToCart } from "@/lib/pixels";
 
 export interface Product {
   id: string;
@@ -47,6 +48,12 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return prev.map((i) => i.id === cartId ? { ...i, quantity: i.quantity + 1 } : i);
       }
       return [...prev, { ...product, id: cartId, price, quantity: 1, selectedVariant: variant }];
+    });
+    trackAddToCart({
+      id: cartId,
+      name: variant ? `${product.name} (${variant.label})` : product.name,
+      price,
+      quantity: 1,
     });
     toast({ title: "Added to cart", description: `${product.name}${variant ? ` (${variant.label})` : ""} has been added to your cart.` });
   }, [toast]);

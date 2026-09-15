@@ -14,6 +14,7 @@ const pageTitles: Record<string, string> = {
   "/dashboard/blogs": "Blog Posts",
   "/dashboard/email": "Email Notifications",
   "/dashboard/announcement": "Announcement Bar",
+  "/dashboard/pixel-settings": "Pixel Settings",
 };
 
 const DashboardLayout = () => {
