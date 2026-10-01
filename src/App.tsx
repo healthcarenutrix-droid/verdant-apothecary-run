@@ -36,9 +36,11 @@ import DashboardEmail from "./pages/dashboard/DashboardEmail";
 import DashboardAnnouncement from "./pages/dashboard/DashboardAnnouncement";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import DashboardPixels from "./pages/dashboard/DashboardPixels";
+import DashboardPopup from "./pages/dashboard/DashboardPopup";
 import PixelLoader from "@/components/PixelLoader";
 import TrackingScripts from "@/components/TrackingScripts";
 import CookieConsent from "@/components/CookieConsent";
+import PromoPopup from "@/components/PromoPopup";
 import { Navigate } from "react-router-dom";
 
 const queryClient = new QueryClient();
@@ -49,7 +51,9 @@ const StorefrontLayout = () => (
       <AnnouncementBar />
       <Navbar />
     </header>
+    <PromoPopup />
     <main className="flex-1">
+
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/products" element={<Products />} />
@@ -85,6 +89,7 @@ const App = () => (
             <PixelLoader />
             <TrackingScripts />
             <CookieConsent />
+
             <div className="min-h-screen flex flex-col">
               <Routes>
                 <Route path="/dashboard" element={<DashboardLayout />}>
@@ -98,7 +103,9 @@ const App = () => (
                   <Route path="email" element={<DashboardEmail />} />
                   <Route path="announcement" element={<DashboardAnnouncement />} />
                   <Route path="pixel-settings" element={<DashboardPixels />} />
+                  <Route path="popup-settings" element={<DashboardPopup />} />
                 </Route>
+                <Route path="/admin/popup-settings" element={<Navigate to="/dashboard/popup-settings" replace />} />
                 <Route path="/admin/pixel-settings" element={<Navigate to="/dashboard/pixel-settings" replace />} />
                 <Route path="/*" element={<StorefrontLayout />} />
               </Routes>
