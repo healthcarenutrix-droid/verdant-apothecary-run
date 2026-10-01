@@ -87,7 +87,7 @@ const App = () => (
             <PixelLoader />
             <TrackingScripts />
             <CookieConsent />
-        <PromoPopup />
+
             <div className="min-h-screen flex flex-col">
               <Routes>
                 <Route path="/dashboard" element={<DashboardLayout />}>
