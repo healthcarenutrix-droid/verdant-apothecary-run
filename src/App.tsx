@@ -103,8 +103,9 @@ const App = () => (
                   <Route path="email" element={<DashboardEmail />} />
                   <Route path="announcement" element={<DashboardAnnouncement />} />
                   <Route path="pixel-settings" element={<DashboardPixels />} />
-            <Route path="popup-settings" element={<DashboardPopup />} />
+                  <Route path="popup-settings" element={<DashboardPopup />} />
                 </Route>
+                <Route path="/admin/popup-settings" element={<Navigate to="/dashboard/popup-settings" replace />} />
                 <Route path="/admin/pixel-settings" element={<Navigate to="/dashboard/pixel-settings" replace />} />
                 <Route path="/*" element={<StorefrontLayout />} />
               </Routes>
