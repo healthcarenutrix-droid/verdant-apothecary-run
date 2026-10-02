@@ -1,6 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 
-export type NotificationEventType = "order" | "message" | "test";
+export type NotificationEventType = "order" | "message" | "test" | "low_stock";
 
 export interface QueueNotificationInput {
   eventType: NotificationEventType;
