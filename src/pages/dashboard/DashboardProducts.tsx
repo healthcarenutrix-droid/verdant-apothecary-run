@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import ProductFormDialog from "@/components/dashboard/ProductFormDialog";
+import { getLowStockItems, isLowStock, notifyLowStock } from "@/lib/lowStock";
 import { AdminProduct, getProducts, addProduct, updateProduct, deleteProduct, getCategories } from "@/data/dashboard-data";
 
 type SortKey = "name" | "price" | "stock";
@@ -57,7 +58,8 @@ const DashboardProducts = () => {
     let list = products;
     if (search) list = list.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
     if (filterCat !== "all") list = list.filter(p => p.categoryId === filterCat);
-    if (filterStatus !== "all") list = list.filter(p => p.status === filterStatus);
+    if (filterStatus === "low") list = list.filter(isLowStock);
+    else if (filterStatus !== "all") list = list.filter(p => p.status === filterStatus);
     list = [...list].sort((a, b) => {
       const v = sortAsc ? 1 : -1;
       if (sortKey === "name") return a.name.localeCompare(b.name) * v;
@@ -76,6 +78,7 @@ const DashboardProducts = () => {
   };
 
   const handleSave = (p: AdminProduct) => {
+    notifyLowStock(editing ? products.find(x => x.id === p.id) : null, p);
     if (editing) { updateProduct(p); toast({ title: "Product updated" }); }
     else { addProduct(p); toast({ title: "Product created" }); }
     reload();
@@ -168,7 +171,7 @@ const DashboardProducts = () => {
         }
       }
 
-      if (changed) { updateProduct(updated); count++; }
+      if (changed) { notifyLowStock(prod, updated); updateProduct(updated); count++; }
     });
 
     setBulkEditOpen(false);
@@ -224,11 +227,12 @@ const DashboardProducts = () => {
           </SelectContent>
         </Select>
         <Select value={filterStatus} onValueChange={v => { setFilterStatus(v); setPage(0); }}>
-          <SelectTrigger className="w-32"><SelectValue placeholder="Status" /></SelectTrigger>
+          <SelectTrigger className="w-40"><SelectValue placeholder="Status" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Status</SelectItem>
             <SelectItem value="active">Active</SelectItem>
             <SelectItem value="draft">Draft</SelectItem>
+            <SelectItem value="low">Low stock ({products.filter(isLowStock).length})</SelectItem>
           </SelectContent>
         </Select>
         <Button variant="outline" className="sm:hidden" onClick={() => { setEditing(null); setFormOpen(true); }}>
@@ -285,7 +289,16 @@ const DashboardProducts = () => {
                   {p.compareAtPrice && <span className="text-xs text-muted-foreground line-through ml-2">₨ {p.compareAtPrice.toLocaleString()}</span>}
                 </TableCell>
                 <TableCell>
-                  <Badge variant={p.stock <= 5 ? "destructive" : "secondary"}>{p.stock}</Badge>
+                  {(() => { const low = getLowStockItems(p); return (
+                    <div className="flex flex-col gap-1 items-start">
+                      <Badge variant={low.length ? "destructive" : "secondary"}>{p.stock}</Badge>
+                      {low.length > 0 && (
+                        <span className="text-xs text-destructive" title={low.map(l => `${l.label}: ${l.stock} (alert ${l.threshold})`).join("\n")}>
+                          Low: {low.map(l => l.label).join(", ")}
+                        </span>
+                      )}
+                    </div>
+                  ); })()}
                 </TableCell>
                 <TableCell>
                   <Badge variant={p.status === "active" ? "default" : "outline"}>

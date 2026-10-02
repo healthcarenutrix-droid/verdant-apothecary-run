@@ -42,6 +42,7 @@ export interface ProductVariant {
   price: number;
   compareAtPrice?: number;
   stock: number;
+  lowStockThreshold?: number;
   sku?: string;
 }
 
@@ -59,6 +60,7 @@ export interface AdminProduct extends SeoFields {
   price: number;
   compareAtPrice?: number;
   stock: number;
+  lowStockThreshold?: number;
   categoryId: string;
   image: string;
   imageAlt?: string;
@@ -315,7 +317,8 @@ const dateOnly = (v?: string) => (v ? String(v).slice(0, 10) : new Date().toISOS
 const rowToProduct = (r: Row): AdminProduct => ({
   id: r.id, name: r.name, description: r.description || "", price: Number(r.price) || 0,
   compareAtPrice: r.compare_at_price != null ? Number(r.compare_at_price) : undefined,
-  stock: r.stock ?? 0, categoryId: r.category_id || "", image: resolveImage(r.image),
+  stock: r.stock ?? 0, lowStockThreshold: r.low_stock_threshold ?? 5,
+  categoryId: r.category_id || "", image: resolveImage(r.image),
   imageAlt: r.image_alt || undefined,
   images: Array.isArray(r.images) ? r.images.map((i: string) => resolveImage(i)) : [],
   status: (r.status as AdminProduct["status"]) || "active", createdAt: dateOnly(r.created_at),
@@ -328,6 +331,7 @@ const rowToProduct = (r: Row): AdminProduct => ({
 const productToRow = (p: AdminProduct): Row => ({
   id: p.id, name: p.name, handle: p.handle || slugify(p.name) || p.id, description: p.description || "",
   price: p.price, compare_at_price: p.compareAtPrice ?? null, stock: p.stock ?? 0,
+  low_stock_threshold: p.lowStockThreshold ?? 5,
   category_id: p.categoryId || null, image: packImage(p.image), image_alt: p.imageAlt || null,
   images: (p.images || []).map(packImage).filter(Boolean), options: p.options || [], variants: p.variants || [],
   price_range: p.priceRange || null, rating: p.rating ?? null, status: p.status,

@@ -21,6 +21,7 @@ const schema = z.object({
   price: z.coerce.number().positive("Price must be positive"),
   compareAtPrice: z.coerce.number().positive().optional().or(z.literal("")),
   stock: z.coerce.number().int().min(0, "Stock cannot be negative"),
+  lowStockThreshold: z.coerce.number().int().min(0, "Cannot be negative"),
   categoryId: z.string().min(1, "Category is required"),
   images: z.array(z.string()).min(1, "At least one image is required"),
   priceRange: z.string().max(50).optional(),
@@ -90,6 +91,7 @@ const ProductFormDialog = ({ open, onOpenChange, product, onSave }: Props) => {
         price: product.price,
         compareAtPrice: product.compareAtPrice || "",
         stock: product.stock,
+        lowStockThreshold: product.lowStockThreshold ?? 5,
         categoryId: product.categoryId,
         images: product.images || (product.image ? [product.image] : []),
         priceRange: product.priceRange || "",
@@ -105,7 +107,7 @@ const ProductFormDialog = ({ open, onOpenChange, product, onSave }: Props) => {
     } else {
       form.reset({
         name: "", description: "", price: 0, compareAtPrice: "",
-        stock: 0, categoryId: "", images: [], priceRange: "", status: true,
+        stock: 0, lowStockThreshold: 5, categoryId: "", images: [], priceRange: "", status: true,
         handle: "", imageAlt: "", metaTitle: "", metaDescription: "", ogImage: "",
       });
       setOptions([]);
@@ -193,6 +195,7 @@ const ProductFormDialog = ({ open, onOpenChange, product, onSave }: Props) => {
       price: values.price,
       compareAtPrice: typeof values.compareAtPrice === "number" ? values.compareAtPrice : undefined,
       stock: values.stock,
+      lowStockThreshold: values.lowStockThreshold,
       categoryId: values.categoryId,
       image: imgs[0],
       images: imgs,
@@ -259,6 +262,14 @@ const ProductFormDialog = ({ open, onOpenChange, product, onSave }: Props) => {
                 <FormItem>
                   <FormLabel>Stock *</FormLabel>
                   <FormControl><Input type="number" {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="lowStockThreshold" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Low stock alert at</FormLabel>
+                  <FormControl><Input type="number" min={0} {...field} /></FormControl>
+                  <p className="text-xs text-muted-foreground">Email admin when stock reaches this level. Variants use this unless set below.</p>
                   <FormMessage />
                 </FormItem>
               )} />
@@ -380,17 +391,18 @@ const ProductFormDialog = ({ open, onOpenChange, product, onSave }: Props) => {
                 <div className="space-y-2 max-h-[300px] overflow-y-auto">
                   {/* Header */}
                   <div className="grid grid-cols-12 gap-2 text-xs text-muted-foreground font-medium px-1">
-                    <div className="col-span-3">Variant</div>
+                    <div className="col-span-2">Variant</div>
                     <div className="col-span-2">SKU</div>
                     <div className="col-span-2">Price (₨)</div>
                     <div className="col-span-2">Compare</div>
                     <div className="col-span-2">Stock</div>
+                    <div className="col-span-1" title="Low stock alert level">Alert</div>
                     <div className="col-span-1"></div>
                   </div>
                   {variants.map((v, idx) => (
                     <div key={v.id} className="grid grid-cols-12 gap-2 items-center border border-border rounded-md p-2">
-                      <div className="col-span-3">
-                        <span className="text-sm font-medium text-foreground">{v.label}</span>
+                      <div className="col-span-2">
+                        <span className="text-sm font-medium text-foreground break-words">{v.label}</span>
                       </div>
                       <div className="col-span-2">
                         <Input className="text-xs h-8" placeholder="SKU" value={v.sku || ""} onChange={e => updateVariant(idx, "sku", e.target.value)} />
@@ -403,6 +415,9 @@ const ProductFormDialog = ({ open, onOpenChange, product, onSave }: Props) => {
                       </div>
                       <div className="col-span-2">
                         <Input className="text-xs h-8" type="number" value={v.stock} onChange={e => updateVariant(idx, "stock", Number(e.target.value))} />
+                      </div>
+                      <div className="col-span-1">
+                        <Input className="text-xs h-8 px-1" type="number" min={0} placeholder={String(form.watch("lowStockThreshold") ?? 5)} value={v.lowStockThreshold ?? ""} onChange={e => updateVariant(idx, "lowStockThreshold", e.target.value === "" ? undefined : Number(e.target.value))} />
                       </div>
                       <div className="col-span-1 flex justify-center">
                         <Button type="button" variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => removeVariant(idx)}>

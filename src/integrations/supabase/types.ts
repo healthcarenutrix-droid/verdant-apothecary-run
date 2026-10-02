@@ -265,6 +265,7 @@ export type Database = {
           image: string | null
           image_alt: string | null
           images: Json
+          low_stock_threshold: number
           meta_description: string | null
           meta_title: string | null
           name: string
@@ -288,6 +289,7 @@ export type Database = {
           image?: string | null
           image_alt?: string | null
           images?: Json
+          low_stock_threshold?: number
           meta_description?: string | null
           meta_title?: string | null
           name: string
@@ -311,6 +313,7 @@ export type Database = {
           image?: string | null
           image_alt?: string | null
           images?: Json
+          low_stock_threshold?: number
           meta_description?: string | null
           meta_title?: string | null
           name?: string
