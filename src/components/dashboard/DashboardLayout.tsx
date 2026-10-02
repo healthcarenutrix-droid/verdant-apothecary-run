@@ -4,6 +4,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { Link } from "react-router-dom";
+import NotificationBell from "./NotificationBell";
 
 const pageTitles: Record<string, string> = {
   "/dashboard": "Dashboard",
@@ -33,11 +34,14 @@ const DashboardLayout = () => {
               <SidebarTrigger />
               <h1 className="text-lg font-semibold text-foreground">{title}</h1>
             </div>
-            {showAdd && (
-              <Button size="sm" id="dashboard-add-btn">
-                <Plus className="h-4 w-4 mr-1" /> Add New
-              </Button>
-            )}
+            <div className="flex items-center gap-2">
+              <NotificationBell />
+              {showAdd && (
+                <Button size="sm" id="dashboard-add-btn">
+                  <Plus className="h-4 w-4 mr-1" /> Add New
+                </Button>
+              )}
+            </div>
           </header>
           <main className="flex-1 p-4 lg:p-6 overflow-auto">
             <Outlet />

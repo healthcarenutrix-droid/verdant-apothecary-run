@@ -156,6 +156,7 @@ export type Database = {
           error_message: string | null
           event_type: string
           id: string
+          is_read: boolean
           payload: Json | null
           recipient_email: string | null
           status: string
@@ -167,6 +168,7 @@ export type Database = {
           error_message?: string | null
           event_type: string
           id?: string
+          is_read?: boolean
           payload?: Json | null
           recipient_email?: string | null
           status?: string
@@ -178,6 +180,7 @@ export type Database = {
           error_message?: string | null
           event_type?: string
           id?: string
+          is_read?: boolean
           payload?: Json | null
           recipient_email?: string | null
           status?: string
