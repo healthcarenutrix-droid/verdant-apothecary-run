@@ -17,6 +17,7 @@ const pageTitles: Record<string, string> = {
   "/dashboard/announcement": "Announcement Bar",
   "/dashboard/pixel-settings": "Pixel Settings",
   "/dashboard/popup-settings": "Popup Settings",
+  "/dashboard/recent-purchases": "Recent Purchase Pop-up",
 };
 
 const DashboardLayout = () => {

@@ -14,6 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
+        urdu: ["'Noto Nastaliq Urdu'", "serif"],
         heading: ["Playfair Display", "serif"],
         body: ["Poppins", "sans-serif"],
       },
