@@ -359,6 +359,45 @@ export type Database = {
         }
         Relationships: []
       }
+      social_proof_settings: {
+        Row: {
+          badge: string
+          display_seconds: number
+          enabled: boolean
+          gap_seconds: number
+          id: boolean
+          initial_delay_seconds: number
+          language: string
+          position: string
+          product_ids: Json
+          updated_at: string
+        }
+        Insert: {
+          badge?: string
+          display_seconds?: number
+          enabled?: boolean
+          gap_seconds?: number
+          id?: boolean
+          initial_delay_seconds?: number
+          language?: string
+          position?: string
+          product_ids?: Json
+          updated_at?: string
+        }
+        Update: {
+          badge?: string
+          display_seconds?: number
+          enabled?: boolean
+          gap_seconds?: number
+          id?: boolean
+          initial_delay_seconds?: number
+          language?: string
+          position?: string
+          product_ids?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
