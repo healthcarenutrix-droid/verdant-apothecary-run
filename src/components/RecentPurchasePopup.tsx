@@ -107,7 +107,7 @@ const RecentPurchasePopup = ({ previewSettings }: Props) => {
         settings.position.startsWith("top-") ? "top-24 sm:top-5" : "bottom-20 sm:bottom-5",
         settings.position.endsWith("-left") && "sm:left-5",
         settings.position.endsWith("-right") && "sm:right-5",
-        settings.position.endsWith("-center") && "sm:left-1/2 sm:-translate-x-1/2",
+        settings.position.endsWith("-center") && "sm:left-0 sm:right-0 sm:mx-auto",
         "overflow-hidden rounded-lg bg-card text-card-foreground border-2 border-primary/70 shadow-xl p-3.5 pe-9",
         "transition-all duration-500 ease-out",
         visible ? "opacity-100 translate-y-0" : cn("opacity-0 pointer-events-none", hiddenMotion),
