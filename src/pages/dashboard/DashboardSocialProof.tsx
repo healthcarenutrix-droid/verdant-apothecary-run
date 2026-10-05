@@ -50,7 +50,7 @@ const DashboardSocialProof = () => {
           <Switch checked={s.enabled} onCheckedChange={(v) => set("enabled", v)} aria-label="Enable" />
         </CardHeader>
         <CardContent className="space-y-5">
-          <div className="grid sm:grid-cols-3 gap-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="space-y-2"><Label>First appears after (sec)</Label>{num("initial_delay_seconds")}</div>
             <div className="space-y-2"><Label>Stays visible (sec)</Label>{num("display_seconds")}</div>
             <div className="space-y-2"><Label>Hidden between (sec)</Label>{num("gap_seconds")}</div>
@@ -61,8 +61,24 @@ const DashboardSocialProof = () => {
               <Select value={s.position} onValueChange={(v) => set("position", v as any)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="top-left">Top left</SelectItem>
+                  <SelectItem value="top-center">Top center</SelectItem>
+                  <SelectItem value="top-right">Top right</SelectItem>
                   <SelectItem value="bottom-left">Bottom left</SelectItem>
+                  <SelectItem value="bottom-center">Bottom center</SelectItem>
                   <SelectItem value="bottom-right">Bottom right</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Movement direction</Label>
+              <Select value={s.animation_direction} onValueChange={(v) => set("animation_direction", v as SocialProofSettings["animation_direction"])}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="up">Move up</SelectItem>
+                  <SelectItem value="down">Move down</SelectItem>
+                  <SelectItem value="left">Move left</SelectItem>
+                  <SelectItem value="right">Move right</SelectItem>
                 </SelectContent>
               </Select>
             </div>

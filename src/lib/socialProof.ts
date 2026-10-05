@@ -1,7 +1,14 @@
 import { products } from "@/data/products";
 
 export type ProofLang = "en" | "roman" | "ur";
-export type ProofPosition = "bottom-left" | "bottom-right";
+export type ProofPosition =
+  | "top-left"
+  | "top-center"
+  | "top-right"
+  | "bottom-left"
+  | "bottom-center"
+  | "bottom-right";
+export type ProofAnimationDirection = "up" | "down" | "left" | "right";
 export type ProofBadge = "cod" | "verified" | "none";
 
 export interface SocialProofSettings {
@@ -10,6 +17,7 @@ export interface SocialProofSettings {
   display_seconds: number;
   gap_seconds: number;
   position: ProofPosition;
+  animation_direction: ProofAnimationDirection;
   language: ProofLang;
   badge: ProofBadge;
   product_ids: string[]; // empty = all active products
@@ -21,13 +29,14 @@ export const DEFAULT_PROOF_SETTINGS: SocialProofSettings = {
   display_seconds: 5,
   gap_seconds: 8,
   position: "bottom-left",
+  animation_direction: "up",
   language: "en",
   badge: "cod",
   product_ids: [],
 };
 
 export const PROOF_COLUMNS =
-  "enabled, initial_delay_seconds, display_seconds, gap_seconds, position, language, badge, product_ids";
+  "enabled, initial_delay_seconds, display_seconds, gap_seconds, position, animation_direction, language, badge, product_ids";
 
 export interface PurchaseNotice {
   name: { en: string; ur: string };
