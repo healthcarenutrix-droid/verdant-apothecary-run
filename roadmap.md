@@ -22,3 +22,4 @@
 - [x] Database-backed announcement bar with dashboard controls and live storefront updates
 
 - [x] Pixel settings page + PixelLoader + cookie consent banner (site_settings table)
+- [x] Recent purchase pop-up with configurable placement, movement direction, timing, language, and stronger contrast

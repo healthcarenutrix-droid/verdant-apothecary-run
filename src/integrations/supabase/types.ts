@@ -361,6 +361,7 @@ export type Database = {
       }
       social_proof_settings: {
         Row: {
+          animation_direction: string
           badge: string
           display_seconds: number
           enabled: boolean
@@ -373,6 +374,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          animation_direction?: string
           badge?: string
           display_seconds?: number
           enabled?: boolean
@@ -385,6 +387,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          animation_direction?: string
           badge?: string
           display_seconds?: number
           enabled?: boolean
