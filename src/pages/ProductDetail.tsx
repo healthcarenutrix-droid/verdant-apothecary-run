@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useState, useMemo, useEffect } from "react";
 import { Star, Minus, Plus, ShoppingCart, ChevronRight, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ import Seo from "@/components/Seo";
 
 const ProductDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const product = products.find((p) => String(p.id) === id);
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
@@ -84,6 +85,11 @@ const ProductDetail = () => {
 
   const handleAdd = () => {
     for (let i = 0; i < qty; i++) addToCart(product, selectedVariant || undefined);
+  };
+
+  const handleBuyNow = () => {
+    handleAdd();
+    navigate("/checkout");
   };
 
   const adminProduct = getProducts().find(p => p.id === String(product.id));
@@ -193,7 +199,7 @@ const ProductDetail = () => {
               <p className="text-xs text-muted-foreground">SKU: {selectedVariant.sku}</p>
             )}
 
-            <div className="flex items-center gap-4 pt-2">
+            <div className="flex items-center gap-3 pt-2 flex-wrap">
               <div className="flex items-center border border-border rounded-md">
                 <button onClick={() => setQty(Math.max(1, qty - 1))} className="px-3 py-2 hover:bg-secondary transition-colors">
                   <Minus className="h-4 w-4" />
@@ -205,10 +211,18 @@ const ProductDetail = () => {
               </div>
               <Button
                 onClick={handleAdd}
-                className="flex-1 md:flex-none md:px-12"
+                className="flex-1 md:flex-none md:px-10"
                 disabled={hasOptions && !allOptionsSelected}
               >
                 <ShoppingCart className="h-4 w-4 mr-2" /> Add to Cart
+              </Button>
+              <Button
+                variant="outline"
+                className="flex-1 md:flex-none md:px-10 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                onClick={handleBuyNow}
+                disabled={hasOptions && !allOptionsSelected}
+              >
+                Buy Now
               </Button>
               <Button
                 variant="outline"
