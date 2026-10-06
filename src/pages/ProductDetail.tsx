@@ -259,19 +259,21 @@ const ProductDetail = () => {
             </div>
 
             {/* Accordion for Description & Reviews */}
-            <Accordion type="multiple" defaultValue={["description"]} className="w-full">
+            <Accordion type="multiple" value={openSections} onValueChange={setOpenSections} className="w-full">
               <AccordionItem value="description">
                 <AccordionTrigger className="text-base font-semibold">Description</AccordionTrigger>
                 <AccordionContent>
                   <p className="text-muted-foreground leading-relaxed">{product.description}. Our products are 100% natural, lab tested, and sourced from premium quality herbs. We ensure that every product meets the highest standards of purity and effectiveness.</p>
                 </AccordionContent>
               </AccordionItem>
-              <AccordionItem value="reviews">
-                <AccordionTrigger className="text-base font-semibold">Reviews</AccordionTrigger>
-                <AccordionContent>
-                  <ProductReviews productId={product.id} />
-                </AccordionContent>
-              </AccordionItem>
+              <div ref={reviewsRef} className="scroll-mt-32">
+                <AccordionItem value="reviews">
+                  <AccordionTrigger className="text-base font-semibold">Reviews</AccordionTrigger>
+                  <AccordionContent>
+                    <ProductReviews productId={product.id} />
+                  </AccordionContent>
+                </AccordionItem>
+              </div>
             </Accordion>
           </div>
         </div>
