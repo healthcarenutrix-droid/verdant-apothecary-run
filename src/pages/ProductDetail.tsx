@@ -1,5 +1,5 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { Star, Minus, Plus, ShoppingCart, ChevronRight, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -20,6 +20,8 @@ const ProductDetail = () => {
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const [qty, setQty] = useState(1);
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
+  const [openSections, setOpenSections] = useState<string[]>(["description"]);
+  const reviewsRef = useRef<HTMLDivElement | null>(null);
 
   const wishlisted = product ? isInWishlist(product.id) : false;
   const hasOptions = product?.options && product.options.length > 0;
@@ -139,14 +141,23 @@ const ProductDetail = () => {
           <div className="space-y-5">
             <h1 className="text-2xl md:text-3xl font-bold text-foreground">{product.name}</h1>
 
-            <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setOpenSections(prev => (prev.includes("reviews") ? prev : [...prev, "reviews"]));
+                requestAnimationFrame(() => reviewsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
+              }}
+              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+              aria-label="Jump to reviews"
+              title="See customer reviews"
+            >
               <div className="flex">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className={`h-4 w-4 ${i < product.rating ? "text-yellow-500 fill-yellow-500" : "text-border"}`} />
                 ))}
               </div>
-              <span className="text-sm text-muted-foreground">({product.rating}/5)</span>
-            </div>
+              <span className="text-sm text-muted-foreground underline-offset-2 hover:underline">({product.rating}/5)</span>
+            </button>
 
             <div className="flex items-center gap-3">
               {activeCompare && (
@@ -248,19 +259,21 @@ const ProductDetail = () => {
             </div>
 
             {/* Accordion for Description & Reviews */}
-            <Accordion type="multiple" defaultValue={["description"]} className="w-full">
+            <Accordion type="multiple" value={openSections} onValueChange={setOpenSections} className="w-full">
               <AccordionItem value="description">
                 <AccordionTrigger className="text-base font-semibold">Description</AccordionTrigger>
                 <AccordionContent>
                   <p className="text-muted-foreground leading-relaxed">{product.description}. Our products are 100% natural, lab tested, and sourced from premium quality herbs. We ensure that every product meets the highest standards of purity and effectiveness.</p>
                 </AccordionContent>
               </AccordionItem>
-              <AccordionItem value="reviews">
-                <AccordionTrigger className="text-base font-semibold">Reviews</AccordionTrigger>
-                <AccordionContent>
-                  <ProductReviews productId={product.id} />
-                </AccordionContent>
-              </AccordionItem>
+              <div ref={reviewsRef} className="scroll-mt-32">
+                <AccordionItem value="reviews">
+                  <AccordionTrigger className="text-base font-semibold">Reviews</AccordionTrigger>
+                  <AccordionContent>
+                    <ProductReviews productId={product.id} />
+                  </AccordionContent>
+                </AccordionItem>
+              </div>
             </Accordion>
           </div>
         </div>
