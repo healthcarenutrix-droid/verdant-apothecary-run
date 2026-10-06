@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useState, useMemo, useEffect } from "react";
 import { Star, Minus, Plus, ShoppingCart, ChevronRight, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
