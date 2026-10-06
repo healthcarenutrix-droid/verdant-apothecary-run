@@ -141,14 +141,23 @@ const ProductDetail = () => {
           <div className="space-y-5">
             <h1 className="text-2xl md:text-3xl font-bold text-foreground">{product.name}</h1>
 
-            <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setOpenSections(prev => (prev.includes("reviews") ? prev : [...prev, "reviews"]));
+                requestAnimationFrame(() => reviewsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
+              }}
+              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+              aria-label="Jump to reviews"
+              title="See customer reviews"
+            >
               <div className="flex">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className={`h-4 w-4 ${i < product.rating ? "text-yellow-500 fill-yellow-500" : "text-border"}`} />
                 ))}
               </div>
-              <span className="text-sm text-muted-foreground">({product.rating}/5)</span>
-            </div>
+              <span className="text-sm text-muted-foreground underline-offset-2 hover:underline">({product.rating}/5)</span>
+            </button>
 
             <div className="flex items-center gap-3">
               {activeCompare && (
